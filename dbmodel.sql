@@ -26,3 +26,4 @@ ALTER TABLE `player` ADD `selected_card_to_pass_id` SMALLINT UNSIGNED NOT NULL D
 ALTER TABLE `player` ADD `selected_rps` varchar(1) NULL;
 ALTER TABLE `player` ADD `played_cards_this_round` varchar(20) DEFAULT '';
 ALTER TABLE `player` ADD `top_contract_value` INT(10) UNSIGNED DEFAULT 5;
+ALTER TABLE `player` ADD `forced_card_id` INT(10) UNSIGNED DEFAULT -1;

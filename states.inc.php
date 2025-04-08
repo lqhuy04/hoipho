@@ -160,7 +160,6 @@ $machinestates = [
             "stealThreeCoins",
             "stealHalfMoney",
             "giveOneCoin",
-            "nameOneCard",
             "stealOneCard",
             "returnOneCard",
             "switchMoney",
@@ -168,6 +167,7 @@ $machinestates = [
             "choseRPSOpponent",
             "selectRPS",
             "copySkill",
+            "nameCard",
         ],
         "transitions"           => [
             "activateSkills"                  => STATE_ACTIVATE_SKILLS,

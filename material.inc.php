@@ -24,11 +24,11 @@ $this->setup_rules = [
     'cards_to_deal'   => [
         3 => 5,
         4 => 4,
-        5 => 4,
+        5 => 3,
     ],
     'ships_in_deck'   => [
-        3 => 3,
-        4 => 4,
+        3 => 8,
+        4 => 8,
         5 => 8,
     ],
 ];
@@ -224,7 +224,7 @@ $this->merchant_card = [
 ];
 
 $this->specialSkillTypes = [
-    '11'   => ['skill_type' => 'name_one_card'],
+    '11'   => ['skill_type' => 'gain_one_coin_and_name_card'],
     '12'   => ['skill_type' => 'pick_rps'],
     '13'   => ['skill_type' => 'play_rps'],
     '42'   => ['skill_type' => 'return_one_card'],
@@ -293,7 +293,7 @@ $this->skill_actions_langitems = [
         'active'  => clienttranslate('Pick a skill to copy and activate'),
         'passive' => clienttranslate('${skill_player_name} must choose a skill to copy and activate'),
     ],
-    'name_one_card' => [
+    'gain_one_coin_and_name_card' => [
         'active'  => clienttranslate('Pick a card that you want to name'),
         'passive' => clienttranslate('${skill_player_name} must pick a card to name'),
     ],

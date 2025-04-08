@@ -96,16 +96,6 @@ class action_hoipholqhuy extends APP_GameAction
         self::ajaxResponse();
     }
 
-    public function nameOneCard()
-    {
-        self::setAjaxMode();
-
-        $card_id = self::getArg("card_id", AT_posint, true);
-        $this->game->nameOneCard($card_id);
-
-        self::ajaxResponse();
-    }
-
     public function giveOneCoin()
     {
         self::setAjaxMode();
@@ -157,7 +147,15 @@ class action_hoipholqhuy extends APP_GameAction
         self::ajaxResponse();
     }
 
+    public function nameCard()
+    {
+        self::setAjaxMode();
 
+        $card_id = self::getArg("card_id", AT_alphanum, true);
+        $this->game->nameCard($card_id);
+
+        self::ajaxResponse();
+    }
     /*
     
     Example:

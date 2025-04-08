@@ -199,6 +199,7 @@
 #cards_to_copy {
     display: flex;
     flex-flow: wrap;
+    justify-content: center;
 }
 
 .copy-skill-panel {

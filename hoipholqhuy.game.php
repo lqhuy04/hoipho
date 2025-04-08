@@ -53,6 +53,7 @@ class hoipholqhuy extends Table
             "copied_skill_type_id"       => 22,
             "stolen_card_id"             => 23,
             "remaining_cards_revealed"   => 24,
+            "named_card_id"         => 25,
         ]);
 
         $this->cards = self::getNew("module.common.deck");
@@ -168,6 +169,7 @@ class hoipholqhuy extends Table
         $result['return_card_to_player'] = self::getGameStateValue('return_card_to_player');
         $result['active_card_id'] = self::getGameStateValue('active_card_id');
         $result['copied_skill_type_id'] = self::getGameStateValue('copied_skill_type_id');
+        $result['named_card_id'] = self::getGameStateValue('named_card_id');
         $result['skill_to_resolve_player'] = self::getGameStateValue('skill_to_resolve_player');
         //
         //                echo "<pre>";
@@ -228,6 +230,7 @@ class hoipholqhuy extends Table
         self::setGameStateValue('discard_move', 0);
 
         self::setGameStateValue('copied_skill_type_id', 0);
+        self::setGameStateValue('named_card_id', 0);
     }
 
     private function playerIsSpectator($player_id)
@@ -359,6 +362,14 @@ class hoipholqhuy extends Table
     function getSkillsToCopy()
     {
         $sql = "SELECT card_id, card_type FROM card WHERE (revealed = 1 OR card_location = 'table' or card_location = 'discard') AND (card_type <> 9 AND card_type <> 13) ORDER BY card_type ASC";
+        $cards = self::getCollectionFromDB($sql);
+
+        return $cards;
+    }
+
+    function getAllCards()
+    {
+        $sql = "SELECT card_id, card_type FROM card WHERE (card_type <> 4 AND card_type <> 16) ORDER BY card_type ASC";
         $cards = self::getCollectionFromDB($sql);
 
         return $cards;
@@ -857,6 +868,18 @@ class hoipholqhuy extends Table
         $selection_changed = false;
         $old_card_id = 0;
 
+        //Check if any player has the card with forced_card_id, if yes, force them to select it, the forced_card_id is in the player table
+        $forced_card_id = self::getGameStateValue('forced_card_id');
+        if ($forced_card_id > 0) {
+            $sql = "SELECT player_id FROM card WHERE card_id = $forced_card_id AND card_location = 'hand' AND card_location_arg = $current_player_id";
+            $result = self::getUniqueValueFromDB($sql);
+            if ($result) {
+                $card_id = $forced_card_id;
+            }
+        }
+
+
+
         // Player already selected a card and changed their mind?
         $sql = "SELECT selected_card_id FROM player WHERE player_id = $current_player_id AND selected_card_id > 0";
         $result = self::getUniqueValueFromDB($sql);
@@ -1261,31 +1284,52 @@ class hoipholqhuy extends Table
         self::setGameStateValue('skill_done', 1);
         $this->gamestate->setAllPlayersNonMultiactive("multiActiveSkill");
     }
-    function nameOneCard()
-    {
-        $this->gamestate->checkPossibleAction('nameOneCard');
+    // function nameOneCard()
+    // {
+    //     $this->gamestate->checkPossibleAction('nameOneCard');
 
-        $players = self::loadPlayersBasicInfos();
-        $current_player_id = self::getCurrentPlayerId();
-        $current_player_name = self::getCurrentPlayerName();
+    //     $players = self::loadPlayersBasicInfos();
+    //     $current_player_id = self::getCurrentPlayerId();
+    //     $current_player_name = self::getCurrentPlayerName();
 
-        
+    //     // Find which player has this card type in hand
+    //     $player_with_card = null;
+    //     foreach ($players as $player_id => $player) {
+    //         $hand = $this->cards->getCardsInLocation('hand', $player_id);
+    //         foreach ($hand as $card) {
+    //             if ($card['type'] == $card_type) {
+    //                 $player_with_card = $player_id;
+    //                 break 2;
+    //             }
+    //         }
+    //     }
 
-        self::notifyAllPlayers(
-            'msg',
-            clienttranslate('${player_name} names ${card_name}'),
-            [
-                'player_name' => $players[$current_player_id]['player_name'],
-                'card_name'   => $this->merchant_card[$card_type]['name'],
-            ]
-        );
+    //     if ($player_with_card) {
+    //         // Store that this player must play this card next turn
+    //         self::setGameStateValue('forced_card_player', $player_with_card);
+    //         self::setGameStateValue('forced_card_type', $card_type);
 
-        self::setGameStateValue('special_skill_type', 11);
-        self::setGameStateValue('named_card_id', $card_id);
-        $this->gamestate->setAllPlayersNonMultiactive("multiActiveSkill");
-        $this->gamestate->setPlayerNonMultiactive($current_player_id, "multiActiveSkillCheckTransition");
+    //         self::notifyAllPlayers(
+    //             'msg',
+    //             clienttranslate('${player_name} must play the ${card_name} card next turn'),
+    //             [
+    //                 'player_name' => $players[$player_with_card]['player_name'],
+    //                 'card_name' => $this->merchant_card[$card_type]['name']
+    //             ]
+    //         );
+    //     } else {
+    //         self::notifyAllPlayers(
+    //             'msg',
+    //             clienttranslate('No player has the selected merchant card in hand'),
+    //             []
+    //         );
+    //     }
 
-    }
+    //     self::setGameStateValue('special_skill_type', 11);
+    //     self::setGameStateValue('named_card_id', $card_id);
+    //     $this->gamestate->setAllPlayersNonMultiactive("multiActiveSkill");
+    //     $this->gamestate->setPlayerNonMultiactive($current_player_id, "multiActiveSkillCheckTransition");
+    // }
 
     function choseRPSOpponent($target_player_id)
     {
@@ -1542,6 +1586,34 @@ class hoipholqhuy extends Table
             $this->gamestate->nextState('endOfTurnCleanup');
         }
     }
+    
+    function nameCard($card_id)
+    {
+        $this->gamestate->checkPossibleAction('nameCard');
+
+        $this->doPause(1);
+
+        $players = self::loadPlayersBasicInfos();
+        $current_player_id = self::getCurrentPlayerId();
+        $current_player_name = $this->getCurrentPlayerName();
+        self::setGameStateValue('named_card_id', $card_id);
+
+        $forced_card_id = $card_id;
+        //update forced_card_id in player table of all player
+        $sql = "UPDATE player SET forced_card_id = $forced_card_id WHERE player_id = $current_player_id";
+        self::DbQuery($sql);
+
+        self::notifyAllPlayers(
+            'msg',
+            clienttranslate('${player_name} names the ${card_name} card'),
+            [
+                'player_name' => $players[$current_player_id]['player_name'],
+                'card_name'   => $this->merchant_card[$this->getCardType($forced_card_id)]['name'],
+            ]
+        );
+
+        $this->gamestate->nextState('endOfTurnCleanup');
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -1588,6 +1660,7 @@ class hoipholqhuy extends Table
         $selectable_players = [];
         $amt_selectable_players = 0;
         $skills_to_copy = [];
+        $all_cards = [];
 
         switch ($skill_type) {
             case 'steal_three_coins':
@@ -1606,11 +1679,6 @@ class hoipholqhuy extends Table
                 break;
             case 'all_players_pass_one_card':
                 break;
-            //Name any card, not just in the player's hand
-            case 'name_one_card':
-                $amt_selectable_players = 1;
-                $selectable_players[$skill_player_id] = $this->getAllCardsInLocation('hand', $skill_player_id);
-                break;
             case 'two_players_switching_money':
                 $amt_selectable_players = 2;
                 $selectable_players[$skill_player_id] = $this->getAllPlayers();
@@ -1622,6 +1690,9 @@ class hoipholqhuy extends Table
                 break;
             case 'copy_skill':
                 $skills_to_copy = $this->getSkillsToCopy();
+                break;
+            case 'gain_one_coin_and_name_card':
+                $all_cards = $this->getAllCards();
                 break;
             case 'pick_rps':
                 $selected_player_id = self::getGameStateValue('rps_opponent');
@@ -1656,6 +1727,7 @@ class hoipholqhuy extends Table
             'amt_selectable_players' => $amt_selectable_players,
             'status_bar_texts'       => $status_bar_texts,
             'skills_to_copy'         => $skills_to_copy,
+            'all_cards'             => $all_cards,
             'placeholders'           => [
                 'skill_player_name'    => $skill_player_name,
                 'selected_player_name' => $selected_player_name,
@@ -1718,8 +1790,11 @@ class hoipholqhuy extends Table
         // }
         // $this->refreshPlayerAssets();
 
+        $sql = "SELECT SUM(contracts_won) FROM player";
+        $sum_contracts_won = self::getUniqueValueFromDB($sql);
+
         // Calculate current top contract value (5 + round number - 1)
-        $top_contract_value = 5 + ($current_round - 1);
+        $top_contract_value = 5 + ($sum_contracts_won*2);
 
         // Update all players' top contract value
         $sql = "UPDATE player SET top_contract_value = $top_contract_value";
@@ -2240,6 +2315,9 @@ class hoipholqhuy extends Table
                         $skill_done = true;
                     }
                     break;
+                case 'gain_one_coin_and_name_card':
+                    $this->gamestate->setPlayersMultiactive([$skill_player_id], 'multiActiveSkill');
+                    break;
                 case 'all_players_pass_one_card':
                     // if it's the last card, auto-pass it
                     $current_move = self::getGameStateValue('current_move');
@@ -2261,9 +2339,6 @@ class hoipholqhuy extends Table
                     break;
                 case 'play_rps':
                     $this->playRPS();
-                    break;
-                case 'gain_one_coin_and_name_card':
-                    $this->nameOneCard($skill_player_id);
                     break;
                 case 'moveCardsToLeft':
                     $this->moveCardsToLeft();

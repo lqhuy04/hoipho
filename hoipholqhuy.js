@@ -98,7 +98,7 @@ define([
                     9: {'text': _("Choose an opponent. You and that opponent must reveal your money , then swap it.")},
                     10: {'text': _("All players must reveal their money. If you have less money than all your opponents, take 1 contract.")},
                     11: {'text': _("Choose a played merchant card. Trigger that card’s skill as if you had played it yourself.")},
-                    12: {'text': _("Take a contract. Each opponenttakes 1 money from the bank.")},
+                    12: {'text': _("Take a contract. Each opponent takes 1 money from the bank.")},
                     13: {'text': _("This merchant has no skill.")},
                     14: {'text': _("Reveal your money , then pay 3 money to the bank.")},
                     15: {'text': _("Reveal your money , then pay 2 money to the opponents on your left and right.")},
@@ -199,7 +199,9 @@ define([
                 this.active_card_id          = gamedatas.active_card_id;
                 this.stolen_card_id          = 0;
                 this.skills_to_copy          = gamedatas.skills_to_copy;
+                this.all_cards               = gamedatas.all_cards;
                 this.copy_skill_id           = gamedatas.copied_skill_type_id;
+                this.named_card_id           = gamedatas.named_card_id;
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -310,6 +312,8 @@ define([
                                     break;
                                 case 'return_one_card':
                                     this.makeHandCardsSelectable();
+                                    break;
+                                case 'gain_one_coin_and_name_card':
                                     break;
                                 case 'copy_skill':
                                     // this.renderCardsToCopy();
@@ -567,6 +571,21 @@ define([
             },
 
             renderCardsToName: function () {
+                for (let card_id in this.all_cards) {
+                    let card = this.all_cards[card_id];
+                    let text = this.card_text[card.card_type].text;
+
+                    let target = 'cards_to_copy';
+                    dojo.place(
+                        this.format_block('jstpl_copy_skill', {
+                            skill_type: card.card_type,
+                            skill_id: card_id,
+                            skill_text: text,
+                        }), target);
+                }
+                dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
+                this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
+                dojo.removeClass('copy_card_wrapper', 'element-hidden');
             },
 
             // renderCardTexts: function (element_prefix) {
@@ -681,6 +700,20 @@ define([
 
             },
 
+            onClickNameOneCard: function (evt) {
+                let target    = evt.currentTarget.id;
+                let split     = target.split('_');
+                let target_id = split[2];
+
+                this.named_card_id = target_id;
+
+                dojo.query('.copy-skill-panel').removeClass('copy-skill-panel-selected');
+                dojo.addClass('copy_skill_' + target_id, 'copy-skill-panel-selected');
+
+                this.removeActionButtons();
+                this.addActionButton('action_button_confirm_copy_skill', _('Confirm: Name this merchant'), 'onClickButtonNameOneCard');
+            },
+
             onClickPlayerTable: function (evt) {
                 let target           = evt.target.id;
                 let split            = target.split('_');
@@ -779,7 +812,6 @@ define([
                     img_pos:            img_pos,
                     additional_classes: additional_classes
                 }), destination_element);
-                this.renderCardTexts("text_");
             },
 
             discardCards: function (cards) {
@@ -796,7 +828,7 @@ define([
                     }
                     this.discardStock.addToStockWithId(card_type, card_id, from);
                     this.myHand.removeFromStockById(card_id);
-                    this.renderCardTexts("text_discard_stock_item_");
+                    //this.renderCardTexts("text_discard_stock_item_");
                     this.addTooltip('discard_stock_item_' + card_id, this.cardTooltip(card_type), '');
                     this.discardStock.resetItemsPosition();
                 }
@@ -839,7 +871,7 @@ define([
                     this.myHand.addToStockWithId(old_card_type, old_card_id);
                     this.addTooltip('my_hand_stock_item_' + old_card_id, this.cardTooltip(old_card_type), '');
 
-                    this.renderCardTexts('text_my_hand_stock_item_');
+                    //this.renderCardTexts('text_my_hand_stock_item_');
 
 
                 } else {
@@ -867,7 +899,7 @@ define([
                             player_id: player_id,
                             img_pos:   img_pos,
                         }), destination_element, "replace");
-                        this.renderCardTexts("text_");
+                        //this.renderCardTexts("text_");
 
                         // this.playerTableStock[player_id].addToStockWithId(card_type, card_id, from);
                         // this.myHand.removeFromStockById(card_id);
@@ -1019,6 +1051,7 @@ define([
                 let status_bar_texts        = args.status_bar_texts;
                 let skill_player_id         = args.skill_player_id;
                 this.skills_to_copy         = args.skills_to_copy;
+                this.all_cards              = args.all_cards;
                 this.skill_player_id        = args.skill_player_id;
                 let placeholders            = args.placeholders;
 
@@ -1045,6 +1078,9 @@ define([
                     switch (this.skill_to_play) {
                         case 'copy_skill':
                             this.renderCardsToCopy();
+                            break;
+                        case 'gain_one_coin_and_name_card':
+                            this.renderCardsToName();
                             break;
                     }
                 }
@@ -1302,6 +1338,28 @@ define([
                 });
             },
 
+            onClickButtonNameOneCard: function (evt) {
+                console.log('onClickButtonNameOneCard');
+
+                let action = 'nameCard';
+                if (!this.checkAction(action)) {
+                    return;
+                }
+
+                if (this.named_card_id == 0) {
+                    return;
+                }
+
+                dojo.addClass('copy_card_wrapper', 'element-hidden');
+                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                    lock:     true,
+                    card_id: this.named_card_id,
+                }, this, function (result) {
+
+                }, function (is_error) {
+                });
+            },
+
             onClickButtonCopySkill: function (evt) {
                 console.log('onClickButtonCopySkill');
 
@@ -1402,6 +1460,7 @@ define([
                 dojo.subscribe('setSkillCardActive', this, "notif_setSkillCardActive");
                 dojo.subscribe('setSkillCardNonActive', this, "notif_setSkillCardNonActive");
                 dojo.subscribe('switchCardText', this, "notif_switchCardText");
+                dojo.subscribe('namedCardText', this, "notif_namedCardText");
                 dojo.subscribe('revealFinalHandCards', this, "notif_revealFinalHandCards");
                 dojo.subscribe('removeEverythingFromTables', this, "notif_removeEverythingFromTables");
                 dojo.subscribe('refreshPlayedCards', this, "notif_refreshPlayedCards");
@@ -1516,6 +1575,15 @@ define([
                 let skill_type_id = args.skill_type_id;
 
                 this.renderCopySkillPanel(skill_type_id);
+            },
+
+
+            notif_namedCardText: function (notif) {
+                let args          = notif.args;
+                let card_id       = args.card_id;
+
+                console.log('card_id: ' + card_id);
+
             },
 
             notif_showSpeechBubble: function (notif) {
