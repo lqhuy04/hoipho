@@ -1587,7 +1587,7 @@ class hoipholqhuy extends Table
         self::setGameStateValue('named_card_id', $card_id);
 
         //update forced_card_id in player table of all player
-        $sql = "UPDATE player SET forced_card_id = $card_id;
+        $sql = "UPDATE player SET forced_card_id = $card_id";
         self::DbQuery($sql);
 
         self::notifyAllPlayers(
