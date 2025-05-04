@@ -1586,17 +1586,16 @@ class hoipholqhuy extends Table
         $current_player_name = $this->getCurrentPlayerName();
         self::setGameStateValue('named_card_id', $card_id);
 
-        // $forced_card_id = $card_id;
-        // //update forced_card_id in player table of all player
-        // $sql = "UPDATE player SET forced_card_id = $forced_card_id WHERE player_id = $current_player_id";
-        // self::DbQuery($sql);
+        //update forced_card_id in player table of all player
+        $sql = "UPDATE player SET forced_card_id = $card_id;
+        self::DbQuery($sql);
 
         self::notifyAllPlayers(
             'msg',
             clienttranslate('${player_name} names the ${card_name} card'),
             [
                 'player_name' => $players[$current_player_id]['player_name'],
-                'card_name'   => $this->merchant_card[$this->getCardType($forced_card_id)]['name'],
+                'card_name'   => $this->merchant_card[$this->getCardType($card_id)]['name'],
             ]
         );
 
