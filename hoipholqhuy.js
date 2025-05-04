@@ -577,15 +577,15 @@ define([
 
                     let target = 'cards_to_copy';
                     dojo.place(
-                        this.format_block('jstpl_copy_skill', {
+                        this.format_block('jstpl_name_card', {
                             skill_type: card.card_type,
-                            skill_id: card_id,
+                            named_card_id: card_id,
                             skill_text: text,
                         }), target);
                 }
                 dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
                 this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
-                dojo.removeClass('copy_card_wrapper', 'element-hidden');
+                dojo.removeClass('name_card_wrapper', 'element-hidden');
             },
 
             // renderCardTexts: function (element_prefix) {
@@ -1005,6 +1005,7 @@ define([
             clearTables: function (cards) {
 
                 dojo.addClass('copy_card_wrapper', 'element-hidden');
+                dojo.addClass('name_card_wrapper', 'element-hidden');
                 this.skill_to_play = '';
 
                 for (let card_id in cards) {
@@ -1350,7 +1351,7 @@ define([
                     return;
                 }
 
-                dojo.addClass('copy_card_wrapper', 'element-hidden');
+                dojo.addClass('name_card_wrapper', 'element-hidden');
                 this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
                     lock:     true,
                     card_id: this.named_card_id,

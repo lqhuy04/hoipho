@@ -868,18 +868,6 @@ class hoipholqhuy extends Table
         $selection_changed = false;
         $old_card_id = 0;
 
-        //Check if any player has the card with forced_card_id, if yes, force them to select it, the forced_card_id is in the player table
-        $forced_card_id = self::getGameStateValue('forced_card_id');
-        if ($forced_card_id > 0) {
-            $sql = "SELECT player_id FROM card WHERE card_id = $forced_card_id AND card_location = 'hand' AND card_location_arg = $current_player_id";
-            $result = self::getUniqueValueFromDB($sql);
-            if ($result) {
-                $card_id = $forced_card_id;
-            }
-        }
-
-
-
         // Player already selected a card and changed their mind?
         $sql = "SELECT selected_card_id FROM player WHERE player_id = $current_player_id AND selected_card_id > 0";
         $result = self::getUniqueValueFromDB($sql);
@@ -1586,7 +1574,7 @@ class hoipholqhuy extends Table
             $this->gamestate->nextState('endOfTurnCleanup');
         }
     }
-    
+
     function nameCard($card_id)
     {
         $this->gamestate->checkPossibleAction('nameCard');
@@ -1598,10 +1586,10 @@ class hoipholqhuy extends Table
         $current_player_name = $this->getCurrentPlayerName();
         self::setGameStateValue('named_card_id', $card_id);
 
-        $forced_card_id = $card_id;
-        //update forced_card_id in player table of all player
-        $sql = "UPDATE player SET forced_card_id = $forced_card_id WHERE player_id = $current_player_id";
-        self::DbQuery($sql);
+        // $forced_card_id = $card_id;
+        // //update forced_card_id in player table of all player
+        // $sql = "UPDATE player SET forced_card_id = $forced_card_id WHERE player_id = $current_player_id";
+        // self::DbQuery($sql);
 
         self::notifyAllPlayers(
             'msg',
@@ -1794,7 +1782,7 @@ class hoipholqhuy extends Table
         $sum_contracts_won = self::getUniqueValueFromDB($sql);
 
         // Calculate current top contract value (5 + round number - 1)
-        $top_contract_value = 5 + ($sum_contracts_won*2);
+        $top_contract_value = 5 + ($sum_contracts_won * 2);
 
         // Update all players' top contract value
         $sql = "UPDATE player SET top_contract_value = $top_contract_value";
