@@ -138,7 +138,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 9,
         'rival_card_ids' => [],
-        'skill_type'     => 'switch_money',
+        'skill_type'     => 'reveal_and_switch_money',
         'sprite_pos'     => 10,
     ],
     10 => [
@@ -148,7 +148,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 10,
         'rival_card_ids' => [11, 12],
-        'skill_type'     => 'no_skill',
+        'skill_type'     => 'reveal_all_players_money_and_check_less_money',
         'sprite_pos'     => 11,
     ],
     11 => [
@@ -158,7 +158,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 11,
         'rival_card_ids' => [4],
-        'skill_type'     => 'return_one_coin',
+        'skill_type'     => 'copy_skill',
         'sprite_pos'     => 12,
     ],
     12 => [
@@ -188,7 +188,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 14,
         'rival_card_ids' => [5],
-        'skill_type'     => 'lose_three_coins',
+        'skill_type'     => 'reveal_money_and_lose_three_coins',
         'sprite_pos'     => 15,
     ],
     15 => [
@@ -198,7 +198,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 15,
         'rival_card_ids' => [1],
-        'skill_type'     => 'give_one_coin_to_neighbours',
+        'skill_type'     => 'reveal_money_and_give_two_coin_to_neighbours',
         'sprite_pos'     => 16,
     ],
     16 => [

@@ -65,7 +65,6 @@ define([
                     let player_board_div = $('player_board_' + player_id);
                     dojo.place(this.format_block('jstpl_player_board', {
                         player_id:     player_id,
-                        str_coins:     _('Coins'),
                         str_contracts: _('Contracts'),
                     }), player_board_div);
                 }
@@ -482,20 +481,29 @@ define([
                 let pos_left                = 0;
                 let coins_amount            = coins_to_render;
 
-                while (coins_to_render >= 5) {
-                    coins_html += '<span class="gold-coin coin-shadow" style="left: ' + pos_left + 'px"></span>';
-                    player_board_coins_html += '<div class="gold-coin player-board-coins coin-shadow" style="left: ' + pos_left + 'px"></div>';
-                    coins_to_render -= 5;
-                    pos_left += 15;
+                // Get reveal_money status for this player
+                let reveal_money = this.players[player_id].reveal_money;
+                
+                if(reveal_money == 1){
+                    while (coins_to_render >= 5) {
+                        coins_html += '<span class="gold-coin coin-shadow" style="left: ' + pos_left + 'px"></span>';
+                        player_board_coins_html += '<div class="gold-coin player-board-coins coin-shadow" style="left: ' + pos_left + 'px"></div>';
+                        coins_to_render -= 5;
+                        pos_left += 15;
+                    }
+                    for (let i = 0; i < coins_to_render; i++) {
+                        coins_html += '<span class="silver-coin coin-shadow" style="top: 4px; left: ' + pos_left + 'px"></span>';
+                        player_board_coins_html += '<div class="silver-coin player-board-coins coin-shadow" style="top: 4px; left: ' + pos_left + 'px"></div>';
+                        pos_left += 10;
+                    }
                 }
-                for (let i = 0; i < coins_to_render; i++) {
-                    coins_html += '<span class="silver-coin coin-shadow" style="top: 4px; left: ' + pos_left + 'px"></span>';
-                    player_board_coins_html += '<div class="silver-coin player-board-coins coin-shadow" style="top: 4px; left: ' + pos_left + 'px"></div>';
-                    pos_left += 10;
+                else {
+                    // If reveal_money is 0, show a placeholder or hide coins
+                    coins_html = '<span class="coin-hidden">?</span>';
+                    player_board_coins_html = '<span class="coin-hidden">?</span>';
                 }
 
                 $('amount_player_coins_' + player_id).innerHTML     = coins_html;
-                $('player_board_' + player_id + '_coins').innerHTML = coins_amount;
             },
 
             refreshPlayersAssets: function () {
@@ -750,7 +758,7 @@ define([
                         this.addActionButton('action_button_confirm_steal_one_card', _('Confirm: Steal 1 card from ' + this.players[target_player_id].name), 'onClickButtonStealACard');
                         this.skill_target_player = target_player_id;
                         break;
-                    case 'two_players_switching_money':
+                    case 'reveal_and_switch_money':
                         this.markMultiplePlayerTablesAsSelected(target_player_id);
                         this.removeActionButtons();
                         if (this.selected_player_tables.length == this.amt_selectable_players) {
@@ -1469,6 +1477,8 @@ define([
                 dojo.subscribe('updatePlayersScore', this, "notif_updatePlayersScore");
                 dojo.subscribe('lightUpPlayerCards', this, "notif_lightUpPlayerCards");
                 dojo.subscribe('removeLitUpPlayerCards', this, "notif_removeLitUpPlayerCards");
+                dojo.subscribe('revealMoney', this, "notif_revealMoney");
+                dojo.subscribe('revealAllMoney', this, "notif_revealAllMoney");
 
 
                 this.notifqueue.setSynchronous('addCoins', 200);
@@ -1810,6 +1820,25 @@ define([
                 let card_ids = args.selected_cards;
 
                 this.revealCards(card_ids);
+            },
+
+            notif_revealMoney: function(notif) {
+                let player_id = notif.args.player_id;
+                // Update local player data
+                this.players[player_id].reveal_money = 1;
+                // Refresh the display
+                this.refreshPlayersAssets();
+            },
+
+            notif_revealAllMoney: function(notif) {
+                // Update reveal_money for all players
+                let all_players = notif.args.all_players;
+                for (let i in all_players) {
+                    let player_id = all_players[i];
+                    this.players[player_id].reveal_money = 1;
+                }
+                // Refresh the display
+                this.refreshPlayersAssets();
             },
 
             notif_flipCards_all: function (notif) {

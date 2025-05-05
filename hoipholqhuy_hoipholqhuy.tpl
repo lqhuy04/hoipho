@@ -212,8 +212,8 @@
 
     const jstpl_name_card                = '<div id="copy_skill_${skill_type}" class="copy-skill-panel center-center-flex"><div id="copy_skilltext_${skill_type}" style="text-align: center">${skill_text}</div></div>'
 
-    const jstpl_player_board = '<div id="player_board_${player_id}_row1" class="player-board-row">' +
-        '<div class="player-board-info-row"><div>${str_coins}: </div><div id="player_board_${player_id}_coins"></div></div>'+
+    const jstpl_player_board = 
+        '<div id="player_board_${player_id}_row1" class="player-board-row">' +
         '<div class="player-board-info-row"><div>${str_contracts}: </div><div id="player_board_${player_id}_contracts"></div></div>'+
         '</div>';
 

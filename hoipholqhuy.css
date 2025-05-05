@@ -512,7 +512,7 @@
     width: 105px;
     height: 105px;
     background-image: url('img/token.png');
-    background-position: -40px -31px;
+    background-position: -40px -48px;
     /*background-size: var(--background-width) var(--background-height);*/
 
     transform: scale(0.4);
@@ -528,7 +528,7 @@
     width: 105px;
     height: 105px;
     background-image: url('img/token.png');
-    background-position: -40px -31px;
+    background-position: -40px -48px;
     /*background-size: var(--background-width) var(--background-height);*/
 
     transform: scale(3);
@@ -537,6 +537,18 @@
 
     animation: coin_fadeout 2s;
     animation-iteration-count: 1;
+}
+
+.coin-hidden {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: #ccc;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-weight: bold;
+    color: #333;
 }
 
 @keyframes border_fadein {

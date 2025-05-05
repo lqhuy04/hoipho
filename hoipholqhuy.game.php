@@ -134,7 +134,7 @@ class hoipholqhuy extends Table
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_score score, reveal_money FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
 
@@ -483,6 +483,19 @@ class hoipholqhuy extends Table
         $selected_card_to_pass_id = self::getUniqueValueFromDB($sql);
 
         return $selected_card_to_pass_id;
+    }
+
+    private function playerHasNamedCard($player_id) {
+        $named_card_id = self::getGameStateValue('named_card_id');
+        if ($named_card_id = 0) return false;
+        else{
+            $sql = "SELECT card_id FROM card WHERE card_location = 'hand' AND card_location_arg = $player_id AND card_id = $named_card_id";
+            $result = self::getUniqueValueFromDB($sql);
+            if (!$result) {
+                return false;
+            }
+        }
+        return true;
     }
 
     function checkPlayerPossessesCard($player_id, $card_id)
@@ -868,6 +881,10 @@ class hoipholqhuy extends Table
         $selection_changed = false;
         $old_card_id = 0;
 
+        // Get the forced card ID for this player
+        $sql = "SELECT forced_card_id FROM player WHERE player_id = $current_player_id";
+        $forced_card_id = self::getUniqueValueFromDB($sql);
+
         // Player already selected a card and changed their mind?
         $sql = "SELECT selected_card_id FROM player WHERE player_id = $current_player_id AND selected_card_id > 0";
         $result = self::getUniqueValueFromDB($sql);
@@ -877,9 +894,36 @@ class hoipholqhuy extends Table
             self::DbQuery($sql);
         }
 
+        // Check if player has the named card and must play it
+        if ($forced_card_id > 0) {
+            // Check if the selected card is the forced card
+            if ($card_id != $forced_card_id) {
+                // Check if player actually has the forced card
+                $sql = "SELECT card_id FROM card WHERE card_location = 'hand' AND card_location_arg = $current_player_id AND card_id = $forced_card_id";
+                $has_forced_card = self::getUniqueValueFromDB($sql);
+                
+                if ($has_forced_card) {
+                    // Force player to play the named card
+                    $sql = "UPDATE player SET selected_card_id = $forced_card_id WHERE player_id = $current_player_id";
+                    self::DbQuery($sql);
+                    
+                    self::notifyAllPlayers('msg', clienttranslate('${player_name} has the named card and must play it'), [
+                        'player_name' => $current_player_name,
+                        'card_name' => $this->merchant_card[$this->getCardType($forced_card_id)]['name']
+                    ]);
+                    
+                    $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
+                    return;
+                }
+            }
+        }
+
+        // Normal card selection
         self::checkPlayerPossessesCard($current_player_id, $card_id);
         $sql = "UPDATE player SET selected_card_id = $card_id WHERE player_id = $current_player_id";
         self::DbQuery($sql);
+        // $sql = "UPDATE player SET selected_card_id = $card_id WHERE player_id = $current_player_id";
+        // self::DbQuery($sql);
 
         if (self::getGameStateValue('discard_move') == 1) {
             $string_select = clienttranslate('${player_name} selects a card to discard');
@@ -1518,6 +1562,19 @@ class hoipholqhuy extends Table
         $player_assets1 = $this->getPlayersAssets($target_player1_id);
         $player_assets2 = $this->getPlayersAssets($target_player2_id);
 
+        $this->revealPlayerMoney($target_player1_id);
+        $this->revealPlayerMoney($target_player2_id);
+
+        // notify players whose money is revealed
+        self::notifyAllPlayers(
+            'msg',
+            clienttranslate('${player1_name} and ${player2_name} reveal and switch their money'),
+            [
+                'player1_name' => $players[$target_player1_id]['player_name'],
+                'player2_name' => $players[$target_player2_id]['player_name'],
+            ]
+        );
+
         if ($player_assets1['coins_total'] >= $player_assets2['coins_total']) {
             $from_player = $target_player1_id;
             $to_player = $target_player2_id;
@@ -1584,6 +1641,8 @@ class hoipholqhuy extends Table
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
         $current_player_name = $this->getCurrentPlayerName();
+        
+        // Set the named card in game state
         self::setGameStateValue('named_card_id', $card_id);
 
         //update forced_card_id in player table of all player
@@ -1657,16 +1716,9 @@ class hoipholqhuy extends Table
                 $amt_selectable_players = 1;
                 $selectable_players[$skill_player_id] = $this->getOtherPlayers($skill_player_id);
                 break;
-            case 'give_one_coin_to_neighbours':
-                $asset = $this->getPlayersAssets($skill_player_id);
-                if ($asset['coins_total'] == 1) {
-                    $amt_selectable_players = 1;
-                    $selectable_players[$skill_player_id] = $this->getPlayerNeighbors($skill_player_id);
-                }
-                break;
             case 'all_players_pass_one_card':
                 break;
-            case 'two_players_switching_money':
+            case 'reveal_and_switch_money':
                 $amt_selectable_players = 2;
                 $selectable_players[$skill_player_id] = $this->getAllPlayers();
                 break;
@@ -1674,6 +1726,15 @@ class hoipholqhuy extends Table
                 $selected_player_id = self::getGameStateValue('return_card_to_player');
                 $skill_target_player_id = $selected_player_id;
                 $selected_player_name = $players[$selected_player_id]['player_name'];
+                break;
+            case 'reveal_money_and_give_two_coin_to_neighbours':
+                $this->revealPlayerMoney($skill_player_id);
+                $this->doPause(500);
+                $asset = $this->getPlayersAssets($skill_player_id);
+                if ($asset['coins_total'] == 1) {
+                    $amt_selectable_players = 1;
+                    $selectable_players[$skill_player_id] = $this->getPlayerNeighbors($skill_player_id);
+                }
                 break;
             case 'copy_skill':
                 $skills_to_copy = $this->getSkillsToCopy();
@@ -2230,7 +2291,7 @@ class hoipholqhuy extends Table
 
         if (!$skill_done) {
             switch ($skill_type) {
-                case 'give_one_coin_to_neighbours':
+                case 'reveal_money_and_give_two_coin_to_neighbours':
                     $asset = $this->getPlayersAssets($skill_player_id);
                     switch ($asset['coins_total']) {
                         case 0:
@@ -2282,11 +2343,15 @@ class hoipholqhuy extends Table
                             break;
                     }
                     break;
+                case 'reveal_all_players_money_and_check_less_money':
+                    $this->revealAllMoneyAndCheckLess($skill_player_id);
+                    $skill_done = true;
+                    break;
                 case 'steal_three_coins':
                 case 'steal_half_money':
                 case 'steal_one_card':
                 case 'return_one_card':
-                case 'two_players_switching_money':
+                case 'reveal_and_switch_money':
                 case 'rock_paper_scissor':
                 case 'copy_skill':
                     if (count($this->getSkillsToCopy()) > 0) {
@@ -2562,7 +2627,9 @@ class hoipholqhuy extends Table
                 $this->manageContracts($player_id, 'add', 1, true);
                 $this->runContractAnimation($player_id, 1);
                 break;
-            case 'lose_three_coins':
+            case 'reveal_money_and_lose_three_coins':
+                $this->revealPlayerMoney($player_id);
+                $this->doPause(500);
                 $this->manageCoins($player_id, 'sub', 3, true);
                 $this->runSubCoinAnimation($player_id, 3);
                 break;
@@ -2836,6 +2903,62 @@ class hoipholqhuy extends Table
         }
 
         return $skill_type;
+    }
+
+    function revealPlayerMoney($player_id) {
+        // Update reveal_money in database
+        $sql = "UPDATE player SET reveal_money = 1 WHERE player_id = $player_id";
+        self::DbQuery($sql);
+        
+        // Notify all players
+        self::notifyAllPlayers('revealMoney', '', [
+            'player_id' => $player_id
+        ]);
+        
+        // Refresh player data
+        $this->refreshPlayerAssets();
+    }
+
+    function revealAllMoneyAndCheckLess($player_id) {
+        $players = self::loadPlayersBasicInfos();
+        $current_player_coins = $this->getPlayersAssets($player_id)['coins_total'];
+        
+        // Reveal all players' money
+        $sql = "UPDATE player SET reveal_money = 1";
+        self::DbQuery($sql);
+        
+        // Get all opponents' coins
+        $all_have_more = true;
+        foreach ($players as $opponent_id => $opponent) {
+            if ($opponent_id != $player_id) {
+                $opponent_coins = $this->getPlayersAssets($opponent_id)['coins_total'];
+                if ($opponent_coins <= $current_player_coins) {
+                    $all_have_more = false;
+                    break;
+                }
+            }
+        }
+        
+        // Notify all players about money reveal
+        self::notifyAllPlayers('revealAllMoney', '', [
+            'player_id' => $player_id,
+            'all_players' => array_keys($players)
+        ]);
+        
+        // If current player has less than all opponents, award contract
+        if ($all_have_more) {
+            $this->manageContracts($player_id, 'add', 1);
+            $this->runContractAnimation($player_id, 1);
+            self::notifyAllPlayers('msg', clienttranslate('${player_name} has less money than all opponents and gains a contract!'), [
+                'player_name' => $players[$player_id]['player_name']
+            ]);
+        } else {
+            self::notifyAllPlayers('msg', clienttranslate('${player_name} does not have less money than all opponents'), [
+                'player_name' => $players[$player_id]['player_name']
+            ]);
+        }
+        
+        return $all_have_more;
     }
 
     private function enableRPSButtons($skill_player_id, $opponent_player_id)
