@@ -86,21 +86,21 @@ define([
                 this.card_types = gamedatas.card_types;
         
                 this.card_text = {
-                    1: {'text': _("Challenge an opponent to Rock-Paper-Scissors. The winner takes half of the loser’s money, rounded down.")},
-                    2: {'text': _("Take 4 money from the bank")},
-                    3: {'text': _("Each opponent must pay you 1 money. If an opponent has a contract, they must pay you 1 extra money (total 2)")},
-                    4: {'text': _("Take 1 money from the bank. Name a merchant card; the player who holds that card must play it next turn.")},
-                    5: {'text': _("Name a merchant card. The player holding that card on hand must pay you 3 money.")},
-                    6: {'text': _("Play a merchant card from your hand and trigger its skill. Then, take a merchant card played by opponent to your hand.")},
-                    7: {'text': _("No player gains money this turn.")},
-                    8: {'text': _("Choose an opponent. Take half their money, rounded down.")},
-                    9: {'text': _("Choose an opponent. You and that opponent must reveal your money , then swap it.")},
-                    10: {'text': _("All players must reveal their money. If you have less money than all your opponents, take 1 contract.")},
-                    11: {'text': _("Choose a played merchant card. Trigger that card’s skill as if you had played it yourself.")},
-                    12: {'text': _("Take a contract. Each opponent takes 1 money from the bank.")},
-                    13: {'text': _("This merchant has no skill.")},
-                    14: {'text': _("Reveal your money , then pay 3 money to the bank.")},
-                    15: {'text': _("Reveal your money , then pay 2 money to the opponents on your left and right.")},
+                    1: {'text': _("1. Challenge an opponent to Rock-Paper-Scissors. The winner takes half of the loser’s money, rounded down.")},
+                    2: {'text': _("2. Take 4 money from the bank")},
+                    3: {'text': _("3. Each opponent must pay you 1 money. If an opponent has a contract, they must pay you 1 extra money (total 2)")},
+                    4: {'text': _("4. Take 1 money from the bank. Name a merchant card; the player who holds that card must play it next turn.")},
+                    5: {'text': _("5. Name a merchant card. The player holding that card on hand must pay you 3 money.")},
+                    6: {'text': _("6. Play a merchant card from your hand and trigger its skill. Then, take a merchant card played by opponent to your hand.")},
+                    7: {'text': _("7. No player gains money this turn.")},
+                    8: {'text': _("8. Choose an opponent. Take half their money, rounded down.")},
+                    9: {'text': _("9. Choose an opponent. You and that opponent must reveal your money , then swap it.")},
+                    10: {'text': _("10. All players must reveal their money. If you have less money than all your opponents, take 1 contract.")},
+                    11: {'text': _("11. Choose a played merchant card. Trigger that card’s skill as if you had played it yourself.")},
+                    12: {'text': _("12. Take a contract. Each opponent takes 1 money from the bank.")},
+                    13: {'text': _("13. This merchant has no skill.")},
+                    14: {'text': _("14. Reveal your money , then pay 3 money to the bank.")},
+                    15: {'text': _("15. Reveal your money , then pay 2 money to the opponents on your left and right.")},
                     16: {'text': _("1 card: you gain 3 coins<br>2 cards: each player gains 1 coin<br>3+ cards: no one gain coins")},
                 };
 
@@ -578,23 +578,63 @@ define([
                 dojo.removeClass('copy_card_wrapper', 'element-hidden');
             },
 
-            renderCardsToName: function () {
-                for (let card_id in this.all_cards) {
-                    let card = this.all_cards[card_id];
-                    let text = this.card_text[card.card_type].text;
+            // renderCardsToName: function () {
+            //     console.log('renderCardsToName');
 
-                    let target = 'cards_to_copy';
+            //     console.log(this.all_cards);
+
+            //     console.log(this.card_text);
+            //     for (let card_id in this.all_cards) {
+            //         let card = this.all_cards[card_id];
+            //         let text = this.card_text[card.card_type].text;
+
+            //         let target = 'cards_to_copy';
+            //         dojo.place(
+            //             this.format_block('jstpl_name_card', {
+            //                 skill_type: card.card_type,
+            //                 named_card_id: card_id,
+            //                 skill_text: text,
+            //             }), target);
+            //     }
+            //     dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
+            //     this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
+            //     dojo.removeClass('name_card_wrapper', 'element-hidden');
+            // },
+
+            renderCardsToName: function() {
+                // 1. Clear container first
+                dojo.empty('cards_to_copy');
+                
+                // 2. Convert to array and sort by card_type
+                const sortedCards = Object.keys(this.all_cards)
+                    .map(card_id => ({
+                        card_id: card_id,
+                        card_type: this.all_cards[card_id].card_type,
+                        data: this.all_cards[card_id]
+                    }))
+                    .sort((a, b) => a.card_type - b.card_type); // Sort by card_type
+
+                console.log(sortedCards);
+                
+                // 3. Render in sorted order
+                sortedCards.forEach(card => {
+                    const text = this.card_text[card.data.card_type].text;
                     dojo.place(
                         this.format_block('jstpl_name_card', {
-                            skill_type: card.card_type,
-                            named_card_id: card_id,
+                            skill_type: card.data.card_type,
+                            named_card_id: card.card_id,
                             skill_text: text,
-                        }), target);
-                }
+                        }), 
+                        'cards_to_copy'
+                    );
+                });
+                
+                // 4. Set up interactions
                 dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
                 this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
                 dojo.removeClass('name_card_wrapper', 'element-hidden');
             },
+
 
             // renderCardTexts: function (element_prefix) {
             //     let maxheight = 48;

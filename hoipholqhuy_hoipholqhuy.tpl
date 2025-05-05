@@ -202,7 +202,7 @@
 
     const jstpl_overlay_number = '<div class="overlay_number number_0"></div>';
 
-    const jstpl_number = '<div class="numbers number_${value}"></div>';
+    const jstpl_number = '<div class=""></div>';
 
     const jstpl_coin     = '<div id="coin_${player_id}_${count}" class="coin coin_${player_id} ${class}" style="top:${top}px; left:${left}px"></div>';
     const jstpl_contract = '<div id="contract_${player_id}_${count}" class="contract contract_${player_id} ${class} contract-shadow" style="top:${top}px; left:${left}px"></div>';
