@@ -1538,7 +1538,8 @@ class hoipholqhuy extends Table
             );
 
             $this->manageCoins($loser, 'sub', $amount);
-            $this->runSubCoinAnimation($loser, $amount);
+            $this->manageCoins($winner, 'add', $amount);
+            $this->runSwitchCoinAnimation($loser, $winner, $amount);
             $this->refreshPlayerAssets();
 
             self::setGameStateValue('skill_done', 1);
@@ -1719,8 +1720,8 @@ class hoipholqhuy extends Table
             case 'all_players_pass_one_card':
                 break;
             case 'reveal_and_switch_money':
-                $amt_selectable_players = 2;
-                $selectable_players[$skill_player_id] = $this->getAllPlayers();
+                $amt_selectable_players = 1;
+                $selectable_players[$skill_player_id] = $this->getOtherPlayers($skill_player_id);
                 break;
             case 'return_one_card':
                 $selected_player_id = self::getGameStateValue('return_card_to_player');
@@ -2677,8 +2678,6 @@ class hoipholqhuy extends Table
                 $this->returnGainedCoins();
                 break;
             case 'rock_paper_scissor':
-                $this->manageCoins($player_id, 'add', 3, true);
-                $this->runAddCoinAnimation($player_id, 3);
                 $this->doPause(500);
                 $this->removeCoinsAndContractsFromPlayerTable();
                 $this->doPause(500);

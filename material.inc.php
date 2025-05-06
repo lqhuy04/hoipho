@@ -27,9 +27,9 @@ $this->setup_rules = [
         5 => 3,
     ],
     'ships_in_deck'   => [
-        3 => 8,
-        4 => 8,
-        5 => 8,
+        3 => 5,
+        4 => 5,
+        5 => 5,
     ],
 ];
 
@@ -118,7 +118,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 7,
         'rival_card_ids' => [],
-        'skill_type'     => 'two_players_switching_money',
+        'skill_type'     => 'return_gained_coins',
         'sprite_pos'     => 8,
     ],
     8  => [
