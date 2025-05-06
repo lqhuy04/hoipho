@@ -315,7 +315,7 @@ define([
                                 case 'gain_one_coin_and_name_card':
                                     break;
                                 case 'copy_skill':
-                                    // this.renderCardsToCopy();
+                                    //this.renderCardsToCopy();
                                     break;
                             }
                             break;
@@ -479,12 +479,12 @@ define([
                 let coins_html              = ''
                 let player_board_coins_html = ''
                 let pos_left                = 0;
-                let coins_amount            = coins_to_render;
 
                 // Get reveal_money status for this player
                 let reveal_money = this.players[player_id].reveal_money;
+                let forced_reveal = this.players[player_id].forced_reveal;
                 
-                if(reveal_money == 1){
+                if(player_id == this.player_id || reveal_money == 1 || forced_reveal == 1){
                     while (coins_to_render >= 5) {
                         coins_html += '<span class="gold-coin coin-shadow" style="left: ' + pos_left + 'px"></span>';
                         player_board_coins_html += '<div class="gold-coin player-board-coins coin-shadow" style="left: ' + pos_left + 'px"></div>';
@@ -603,7 +603,7 @@ define([
 
             renderCardsToName: function() {
                 // 1. Clear container first
-                dojo.empty('cards_to_copy');
+                dojo.empty('cards_to_name');
                 
                 // 2. Convert to array and sort by card_type
                 const sortedCards = Object.keys(this.all_cards)
@@ -625,7 +625,7 @@ define([
                             named_card_id: card.card_id,
                             skill_text: text,
                         }), 
-                        'cards_to_copy'
+                        'cards_to_name'
                     );
                 });
                 
@@ -799,13 +799,11 @@ define([
                         this.skill_target_player = target_player_id;
                         break;
                     case 'reveal_and_switch_money':
-                        this.markMultiplePlayerTablesAsSelected(target_player_id);
+                        this.markPlayerTableAsSelected(target_player_id);
+                        this.skill_target_player = target_player_id;
                         this.removeActionButtons();
-                        if (this.selected_player_tables.length == this.amt_selectable_players) {
-                            let name1 = this.players[this.selected_player_tables[0]].name;
-                            let name2 = this.players[this.selected_player_tables[1]].name;
-                            this.addActionButton('action_button_confirm_steal_one_card', _('Confirm: Switch money between ' + name1 + ' and ' + name2), 'onClickButtonSwitchMoney');
-                        }
+                        this.addActionButton('action_button_confirm_steal_one_card', _('Confirm: Switch money between you and ' + this.players[target_player_id].name), 'onClickButtonSwitchMoney');
+                        break;
                 }
 
             },
@@ -1379,8 +1377,7 @@ define([
 
                 this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
                     lock:           true,
-                    target_player1: this.selected_player_tables[0],
-                    target_player2: this.selected_player_tables[1]
+                    target_player: this.skill_target_player
                 }, this, function (result) {
 
                 }, function (is_error) {
@@ -1519,6 +1516,7 @@ define([
                 dojo.subscribe('removeLitUpPlayerCards', this, "notif_removeLitUpPlayerCards");
                 dojo.subscribe('revealMoney', this, "notif_revealMoney");
                 dojo.subscribe('revealAllMoney', this, "notif_revealAllMoney");
+                dojo.subscribe('revealAllMoneyForComparison', this, "notif_revealAllMoneyForComparison");
 
 
                 this.notifqueue.setSynchronous('addCoins', 200);
@@ -1861,6 +1859,18 @@ define([
 
                 this.revealCards(card_ids);
             },
+
+            notif_revealAllMoneyForComparison: function (notif) {
+                // Update reveal_money for all players
+                let all_players = notif.args.all_players;
+                for (let i in all_players) {
+                    let player_id = all_players[i];
+                    this.players[player_id].forced_reveal = 1;
+                }
+                // Refresh the display
+                this.refreshPlayersAssets();
+            },
+
 
             notif_revealMoney: function(notif) {
                 let player_id = notif.args.player_id;

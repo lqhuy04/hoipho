@@ -110,9 +110,8 @@ class action_hoipholqhuy extends APP_GameAction
     {
         self::setAjaxMode();
 
-        $target_player1_id = self::getArg("target_player1", AT_posint, true);
-        $target_player2_id = self::getArg("target_player2", AT_posint, true);
-        $this->game->switchMoney($target_player1_id, $target_player2_id);
+        $target_player = self::getArg("target_player", AT_posint, true);
+        $this->game->switchMoney($target_player);
 
         self::ajaxResponse();
     }

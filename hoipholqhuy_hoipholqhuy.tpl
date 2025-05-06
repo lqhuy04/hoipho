@@ -8,27 +8,6 @@
 <div id="game_main_wrapper">
     <div class="game-table table-shadow">
         <div class="center-flex">
-            <div id="my_hand_wrapper" class="outer-block">
-                <div style="text-align: center; margin-bottom: 5px; color:black">{MY_HAND}</div>
-                <div id="my_hand_stock"></div>
-            </div>
-        </div>
-
-        <div class="center-flex">
-            <div id="name_card_wrapper" class="outer-block element-hidden">
-                <div style="text-align: center; color:black">{NAME_A_CARD}</div>
-                <div id="cards_to_copy"></div>
-            </div>
-        </div>
-
-        <div class="center-flex">
-            <div id="copy_card_wrapper" class="outer-block element-hidden">
-                <div style="text-align: center; color: black">{PICK_A_SKILL}</div>
-                <div id="cards_to_copy"></div>
-            </div>
-        </div>
-
-        <div class="center-flex">
             <div id="player_tables" class="bg-light player-tables-shadow">
                 <!-- BEGIN player_table -->
                 <div id="table_player_{PLAYER_ID}" class="player-table outer-block table-shadow">
@@ -51,6 +30,27 @@
                     </div>
                 </div>
                 <!-- END player_table -->
+            </div>
+        </div>
+
+        <div class="center-flex">
+            <div id="my_hand_wrapper" class="outer-block">
+                <div style="text-align: center; margin-bottom: 5px; color:black">{MY_HAND}</div>
+                <div id="my_hand_stock"></div>
+            </div>
+        </div>
+
+        <div class="center-flex">
+            <div id="name_card_wrapper" class="outer-block element-hidden">
+                <div style="text-align: center; color:black">{NAME_A_CARD}</div>
+                <div id="cards_to_name"></div>
+            </div>
+        </div>
+
+        <div class="center-flex">
+            <div id="copy_card_wrapper" class="outer-block element-hidden">
+                <div style="text-align: center; color: black">{PICK_A_SKILL}</div>
+                <div id="cards_to_copy"></div>
             </div>
         </div>
 

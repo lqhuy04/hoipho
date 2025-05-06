@@ -361,7 +361,7 @@ class hoipholqhuy extends Table
 
     function getSkillsToCopy()
     {
-        $sql = "SELECT card_id, card_type FROM card WHERE (revealed = 1 OR card_location = 'table' or card_location = 'discard') AND (card_type <> 9 AND card_type <> 13) ORDER BY card_type ASC";
+        $sql = "SELECT card_id, card_type FROM card WHERE (revealed = 1 OR card_location = 'table' or card_location = 'discard') AND (card_type <> 11 AND card_type <> 13 AND card_type <> 16) ORDER BY card_type ASC";
         $cards = self::getCollectionFromDB($sql);
 
         return $cards;
@@ -1550,7 +1550,7 @@ class hoipholqhuy extends Table
         $this->gamestate->nextState('multiActiveSkill');
     }
 
-    function switchMoney($target_player1_id, $target_player2_id)
+    function switchMoney($target_player_id)
     {
         $this->gamestate->checkPossibleAction('switchMoney');
 
@@ -1560,29 +1560,29 @@ class hoipholqhuy extends Table
 
         self::giveExtraTime($current_player_id);
 
-        $player_assets1 = $this->getPlayersAssets($target_player1_id);
-        $player_assets2 = $this->getPlayersAssets($target_player2_id);
+        $player_assets1 = $this->getPlayersAssets($current_player_id);
+        $player_assets2 = $this->getPlayersAssets($target_player_id);
 
-        $this->revealPlayerMoney($target_player1_id);
-        $this->revealPlayerMoney($target_player2_id);
+        $this->revealPlayerMoney($current_player_id);
+        $this->revealPlayerMoney($target_player_id);
 
         // notify players whose money is revealed
         self::notifyAllPlayers(
             'msg',
             clienttranslate('${player1_name} and ${player2_name} reveal and switch their money'),
             [
-                'player1_name' => $players[$target_player1_id]['player_name'],
-                'player2_name' => $players[$target_player2_id]['player_name'],
+                'player1_name' => $players[$current_player_id]['player_name'],
+                'player2_name' => $players[$target_player_id]['player_name'],
             ]
         );
 
         if ($player_assets1['coins_total'] >= $player_assets2['coins_total']) {
-            $from_player = $target_player1_id;
-            $to_player = $target_player2_id;
+            $from_player = $current_player_id;
+            $to_player = $target_player_id;
             $amount = $player_assets1['coins_total'] - $player_assets2['coins_total'];
         } else {
-            $from_player = $target_player2_id;
-            $to_player = $target_player1_id;
+            $from_player = $target_player_id;
+            $to_player = $current_player_id;
             $amount = $player_assets2['coins_total'] - $player_assets1['coins_total'];
         }
 
@@ -1598,8 +1598,8 @@ class hoipholqhuy extends Table
             'msg',
             clienttranslate('${player1_name} and ${player2_name} are switching their money'),
             [
-                'player1_name' => $players[$target_player1_id]['player_name'],
-                'player2_name' => $players[$target_player2_id]['player_name'],
+                'player1_name' => $players[$current_player_id]['player_name'],
+                'player2_name' => $players[$target_player_id]['player_name'],
             ]
         );
 
@@ -2468,6 +2468,9 @@ class hoipholqhuy extends Table
 
     function stResolveRound()
     {
+        $this->revealAllMoneyForComparison();
+        $this->doPause(1000);
+
         $winner = $this->getWinnerOfThisRound();
         $round_winner_player_id = $winner['winner_player_id'];
 
@@ -2481,6 +2484,9 @@ class hoipholqhuy extends Table
         $this->doPause(2000);
         $this->removeCoinsAndContractsFromPlayerTable();
         $this->doPause(2000);
+        $this->hideUnrevealedMoney();
+        $this->refreshPlayerAssets();
+        $this->doPause(1000);
 
         // Check if we have a winner
         if ($victory_condition_met) {
@@ -2902,6 +2908,34 @@ class hoipholqhuy extends Table
         }
 
         return $skill_type;
+    }
+
+    private function hideUnrevealedMoney() {
+        // Hide money for players who weren't revealed during gameplay
+        $sql = "UPDATE player SET forced_reveal = 0 WHERE reveal_money = 0 AND forced_reveal = 1";
+        self::DbQuery($sql);
+        
+        // Reset the forced_reveal flag for next round
+        $sql = "UPDATE player SET forced_reveal = 0 WHERE forced_reveal = 1";
+        self::DbQuery($sql);
+        
+        $this->refreshPlayerAssets();
+    }
+
+    private function revealAllMoneyForComparison() {
+        $players = self::loadPlayersBasicInfos();
+
+        // Reveal all players' money
+        $sql = "UPDATE player SET forced_reveal = 1";
+        self::DbQuery($sql);
+        $this->refreshPlayerAssets();
+
+        // Reveal all money temporarily
+        self::notifyAllPlayers('revealAllMoney', '', [
+            'all_players' => array_keys($players)
+        ]);
+
+
     }
 
     function revealPlayerMoney($player_id) {
