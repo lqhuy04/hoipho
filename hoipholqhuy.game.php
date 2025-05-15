@@ -2650,16 +2650,6 @@ class hoipholqhuy extends Table
                     }
                 }
                 break;
-            case 'gain_one_coin_and_name_a_card':
-                $this->manageCoins($player_id, 'add', 1, true);
-                $this->runAddCoinAnimation($player_id, 1);
-                $this->doPause(500);
-                $this->removeCoinsAndContractsFromPlayerTable();
-                $this->doPause(500);
-                $this->refreshPlayerAssets();
-                $this->doPause(2000);
-                $skill_with_player_input = true;
-                break;
             case 'all_players_pay_you':
                 foreach ($players as $opponent_id => $opponent) {
                     if ($opponent_id != $player_id) {
