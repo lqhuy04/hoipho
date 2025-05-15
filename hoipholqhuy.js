@@ -578,62 +578,64 @@ define([
                 dojo.removeClass('copy_card_wrapper', 'element-hidden');
             },
 
-            // renderCardsToName: function () {
-            //     console.log('renderCardsToName');
+            renderCardsToName: function () {
+                console.log('renderCardsToName');
 
-            //     console.log(this.all_cards);
+                console.log(this.all_cards);
 
-            //     console.log(this.card_text);
-            //     for (let card_id in this.all_cards) {
-            //         let card = this.all_cards[card_id];
-            //         let text = this.card_text[card.card_type].text;
+                console.log(this.card_text);
+                for (let card_id in this.all_cards) {
+                    let card = this.all_cards[card_id];
+                    let text = this.card_text[card.card_type].text;
 
-            //         let target = 'cards_to_copy';
-            //         dojo.place(
-            //             this.format_block('jstpl_name_card', {
-            //                 skill_type: card.card_type,
-            //                 named_card_id: card_id,
-            //                 skill_text: text,
-            //             }), target);
-            //     }
-            //     dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
-            //     this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
-            //     dojo.removeClass('name_card_wrapper', 'element-hidden');
-            // },
-
-            renderCardsToName: function() {
-                // 1. Clear container first
-                dojo.empty('cards_to_name');
-                
-                // 2. Convert to array and sort by card_type
-                const sortedCards = Object.keys(this.all_cards)
-                    .map(card_id => ({
-                        card_id: card_id,
-                        card_type: this.all_cards[card_id].card_type,
-                        data: this.all_cards[card_id]
-                    }))
-                    .sort((a, b) => a.card_type - b.card_type); // Sort by card_type
-
-                console.log(sortedCards);
-                
-                // 3. Render in sorted order
-                sortedCards.forEach(card => {
-                    const text = this.card_text[card.data.card_type].text;
+                    let target = 'cards_to_name';
                     dojo.place(
                         this.format_block('jstpl_name_card', {
-                            skill_type: card.data.card_type,
-                            named_card_id: card.card_id,
+                            skill_type: card.card_type,
+                            named_card_id: card_id,
                             skill_text: text,
-                        }), 
-                        'cards_to_name'
-                    );
-                });
-                
-                // 4. Set up interactions
+                        }), target);
+                }
                 dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
                 this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
                 dojo.removeClass('name_card_wrapper', 'element-hidden');
             },
+
+            // renderCardsToName: function() {
+            //     // 1. Clear container first
+            //     dojo.empty('cards_to_name');
+                
+            //     // 2. Convert to array and sort by card_type
+            //     const sortedCards = Object.keys(this.all_cards)
+            //         .map(card_id => ({
+            //             card_id: card_id,
+            //             card_type: this.all_cards[card_id].card_type,
+            //             data: this.all_cards[card_id]
+            //         }))
+            //         .sort((a, b) => a.card_type - b.card_type); // Sort by card_type
+
+            //     // 3. Render in sorted order
+            //     sortedCards.forEach(card => {
+            //         // Get the card name from merchant_card array using card_type
+            //         const cardName = this.card_types[card.data.card_type].name;
+            //         const text = this.card_text[card.data.card_type].text;
+                    
+            //         dojo.place(
+            //             this.format_block('jstpl_name_card', {
+            //                 skill_type: card.data.card_type,
+            //                 named_card_id: card.card_id,
+            //                 skill_text: text,
+            //                 card_name: cardName // Add card name to template
+            //             }), 
+            //             'cards_to_name'
+            //         );
+            //     });
+                
+            //     // 4. Set up interactions
+            //     dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
+            //     this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
+            //     dojo.removeClass('name_card_wrapper', 'element-hidden');
+            // },
 
 
             // renderCardTexts: function (element_prefix) {

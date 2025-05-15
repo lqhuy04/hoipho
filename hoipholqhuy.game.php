@@ -2369,6 +2369,14 @@ class hoipholqhuy extends Table
                     }
                     break;
                 case 'gain_one_coin_and_name_card':
+                    // add 1 coin to player
+                    $this->manageCoins($skill_player_id, 'add', 1, true);
+                    $this->runAddCoinAnimation($skill_player_id, 1);
+                    $this->doPause(500);
+                    $this->removeCoinsAndContractsFromPlayerTable();
+                    $this->doPause(500);
+                    $this->refreshPlayerAssets();
+                    $this->doPause(2000);
                     $this->gamestate->setPlayersMultiactive([$skill_player_id], 'multiActiveSkill');
                     break;
                 case 'all_players_pass_one_card':
@@ -2673,6 +2681,15 @@ class hoipholqhuy extends Table
             case 'return_gained_coins':
                 $this->returnGainedCoins();
                 break;
+            // case 'gain_one_coin_and_name_card':
+            //     $this->manageCoins($player_id, 'add', 1, true);
+            //     $this->runAddCoinAnimation($player_id, 1);
+            //     $this->doPause(500);
+            //     $this->removeCoinsAndContractsFromPlayerTable();
+            //     $this->doPause(500);
+            //     $this->refreshPlayerAssets();
+            //     $this->doPause(2000);
+            //     break;
             case 'rock_paper_scissor':
                 $this->doPause(500);
                 $this->removeCoinsAndContractsFromPlayerTable();

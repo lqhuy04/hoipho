@@ -53,7 +53,7 @@ $this->merchant_ship_type_id = 16;
 $this->merchant_card = [
     1  => [
         'type_id'        => 1,
-        'name'           => 'Zhang Shu',
+        'name'           => 'Mr Mouse - Zhang Shu',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 1,
@@ -63,7 +63,7 @@ $this->merchant_card = [
     ],
     2  => [
         'type_id'        => 2,
-        'name'           => 'Tran Trau',
+        'name'           => 'Mr Buffalo - Tran Trau',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 2,
@@ -73,7 +73,7 @@ $this->merchant_card = [
     ],
     3  => [
         'type_id'        => 3,
-        'name'           => 'Baagh Acharya',
+        'name'           => 'Mr Tiger - Baagh Acharya',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 3,
@@ -83,7 +83,7 @@ $this->merchant_card = [
     ],
     4  => [
         'type_id'        => 4,
-        'name'           => 'Madame Rabbit',
+        'name'           => 'Madame Rabbit - Tu Niang',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 4,
@@ -93,7 +93,7 @@ $this->merchant_card = [
     ],
     5  => [
         'type_id'        => 5,
-        'name'           => 'Chat de Merchant',
+        'name'           => 'Mr Cat - Chat de Merchant',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 5,
@@ -103,7 +103,7 @@ $this->merchant_card = [
     ],
     6  => [
         'type_id'        => 6,
-        'name'           => 'Cri Naga',
+        'name'           => 'Mr Naga - Cri Naga',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 6,
@@ -113,7 +113,7 @@ $this->merchant_card = [
     ],
     7  => [
         'type_id'        => 7,
-        'name'           => 'Ryu Ito',
+        'name'           => 'Mr Dragon - Ryu Ito',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 7,
@@ -123,7 +123,7 @@ $this->merchant_card = [
     ],
     8  => [
         'type_id'        => 8,
-        'name'           => 'Schlange Adler',
+        'name'           => 'Mr Snake - Schlange Adler',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 8,
@@ -133,7 +133,7 @@ $this->merchant_card = [
     ],
     9  => [
         'type_id'        => 9,
-        'name'           => 'Caballo Garcia',
+        'name'           => 'Ms Horse - Caballo Garcia',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 9,
@@ -143,7 +143,7 @@ $this->merchant_card = [
     ],
     10 => [
         'type_id'        => 10,
-        'name'           => 'Yoo Yang',
+        'name'           => 'Mrs Sheep - Yoo Yang',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 10,
@@ -153,7 +153,7 @@ $this->merchant_card = [
     ],
     11 => [
         'type_id'        => 11,
-        'name'           => 'Lee Yoemso',
+        'name'           => 'Mr Goat - Lee Yoemso',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 11,
@@ -163,7 +163,7 @@ $this->merchant_card = [
     ],
     12 => [
         'type_id'        => 12,
-        'name'           => 'Monyet Gunawan',
+        'name'           => 'Mr Monkey - Monyet Gunawan',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 12,
@@ -173,7 +173,7 @@ $this->merchant_card = [
     ],
     13 => [
         'type_id'        => 13,
-        'name'           => 'Ki Sahin',
+        'name'           => 'Ms Chicken - Ki Sahin',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 13,
@@ -183,7 +183,7 @@ $this->merchant_card = [
     ],
     14 => [
         'type_id'        => 14,
-        'name'           => 'Lady of Doggingham',
+        'name'           => 'Lady Dog - Lady of Doggingham',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 14,
@@ -193,7 +193,7 @@ $this->merchant_card = [
     ],
     15 => [
         'type_id'        => 15,
-        'name'           => 'Porco van Hartsinck',
+        'name'           => 'Mr Pig - Porco van Hartsinck',
         'is_merchant'    => 1,
         'is_ship'        => 0,
         'reputation'     => 15,
