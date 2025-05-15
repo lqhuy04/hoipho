@@ -579,25 +579,35 @@ define([
                 this.addTooltipToClass('copy-skill-panel', '', _('Activate this skill'), 0);
                 dojo.removeClass('copy_card_wrapper', 'element-hidden');
             },
-
+            
             renderCardsToName: function () {
                 console.log('renderCardsToName');
-
                 console.log(this.all_cards);
-
                 console.log(this.card_text);
-                for (let card_id in this.all_cards) {
-                    let card = this.all_cards[card_id];
-                    let text = this.card_text[card.card_type].text;
 
+                // Convert object to array and sort by card_type
+                const cardsArray = Object.values(this.all_cards);
+                cardsArray.sort((a, b) => a.card_type - b.card_type);
+
+                // Clear existing content
+                dojo.empty('cards_to_name');
+
+                // Render sorted cards
+                cardsArray.forEach(card => {
+                    let text = this.card_text[card.card_type].text;
                     let target = 'cards_to_name';
+                    
                     dojo.place(
                         this.format_block('jstpl_name_card', {
                             skill_type: card.card_type,
-                            named_card_id: card_id,
+                            named_card_id: card.card_id,  // Changed from card_id to card.card_id
                             skill_text: text,
-                        }), target);
-                }
+                        }), 
+                        target
+                    );
+                });
+
+                // Reattach event handlers
                 dojo.query('.copy-skill-panel').connect('onclick', this, 'onClickNameOneCard');
                 this.addTooltipToClass('copy-skill-panel', '', _('Name this card'), 0);
                 dojo.removeClass('name_card_wrapper', 'element-hidden');
