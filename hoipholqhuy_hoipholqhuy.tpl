@@ -42,14 +42,14 @@
 
         <div class="center-flex">
             <div id="name_card_wrapper" class="outer-block element-hidden">
-                <div style="text-align: center; color:black">{NAME_A_CARD}</div>
+                <div style="text-align: center; color:black">{NAME A CARD}</div>
                 <div id="cards_to_name"></div>
             </div>
         </div>
 
         <div class="center-flex">
             <div id="copy_card_wrapper" class="outer-block element-hidden">
-                <div style="text-align: center; color: black">{PICK_A_SKILL}</div>
+                <div style="text-align: center; color: black">{PICK A SKILL}</div>
                 <div id="cards_to_copy"></div>
             </div>
         </div>

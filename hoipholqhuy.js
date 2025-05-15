@@ -314,6 +314,8 @@ define([
                                     break;
                                 case 'gain_one_coin_and_name_card':
                                     break;
+                                case 'name_card_and_take_three_coins':
+                                    break;
                                 case 'copy_skill':
                                     //this.renderCardsToCopy();
                                     break;
@@ -564,12 +566,12 @@ define([
             renderCardsToCopy: function () {
                 for (let card_id in this.skills_to_copy) {
                     let card = this.skills_to_copy[card_id];
-                    let text = this.card_text[card.card_type].text;
+                    let text = this.card_text[card_id].text;
 
                     let target = 'cards_to_copy';
                     dojo.place(
                         this.format_block('jstpl_copy_skill', {
-                            skill_type: card.card_type,
+                            skill_type: card_id,
                             skill_text: text,
                         }), target);
                 }
@@ -754,6 +756,10 @@ define([
                 let target    = evt.currentTarget.id;
                 let split     = target.split('_');
                 let target_id = split[2];
+
+                console.log('onClickNameOneCard');
+                console.log(target);
+                console.log(target_id);
 
                 this.named_card_id = target_id;
 
@@ -1131,6 +1137,9 @@ define([
                         case 'gain_one_coin_and_name_card':
                             this.renderCardsToName();
                             break;
+                        case 'name_card_and_take_three_coins':
+                            this.renderCardsToName();
+                            break;
                     }
                 }
 
@@ -1388,8 +1397,14 @@ define([
 
             onClickButtonNameOneCard: function (evt) {
                 console.log('onClickButtonNameOneCard');
+                
+                let action;
+                if (this.skill_to_play == 'name_card_and_take_three_coins') {
+                    action = 'nameCardToTakeMoney';
+                } else {
+                    action = 'nameCardToForcePlay';
+                }
 
-                let action = 'nameCard';
                 if (!this.checkAction(action)) {
                     return;
                 }
@@ -1401,12 +1416,34 @@ define([
                 dojo.addClass('name_card_wrapper', 'element-hidden');
                 this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
                     lock:     true,
-                    card_id: this.named_card_id,
+                    card_type: this.named_card_id,
                 }, this, function (result) {
 
                 }, function (is_error) {
                 });
             },
+
+            // onClickButtonNameOneCardToTakeMoney: function (evt) {
+            //     console.log('onClickButtonNameOneCardToTakeMoney');
+                
+            //     let action = 'nameCardToTakeMoney';
+            //     if (!this.checkAction(action)) {
+            //         return;
+            //     }
+
+            //     if (this.named_card_id == 0) {
+            //         return;
+            //     }
+
+            //     dojo.addClass('name_card_wrapper', 'element-hidden');
+            //     this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+            //         lock:     true,
+            //         card_type: this.named_card_id,
+            //     }, this, function (result) {
+
+            //     }, function (is_error) {
+            //     });
+            // },
 
             onClickButtonCopySkill: function (evt) {
                 console.log('onClickButtonCopySkill');

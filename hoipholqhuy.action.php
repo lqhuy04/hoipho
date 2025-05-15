@@ -146,12 +146,22 @@ class action_hoipholqhuy extends APP_GameAction
         self::ajaxResponse();
     }
 
-    public function nameCard()
+    public function nameCardToForcePlay()
     {
         self::setAjaxMode();
 
-        $card_id = self::getArg("card_id", AT_alphanum, true);
-        $this->game->nameCard($card_id);
+        $card_type = self::getArg("card_type", AT_alphanum, true);
+        $this->game->nameCardToForcePlay($card_type);
+
+        self::ajaxResponse();
+    }
+
+        public function nameCardToTakeMoney()
+    {
+        self::setAjaxMode();
+
+        $card_type = self::getArg("card_type", AT_alphanum, true);
+        $this->game->nameCardToTakeMoney($card_type);
 
         self::ajaxResponse();
     }

@@ -27,5 +27,6 @@ ALTER TABLE `player` ADD `selected_rps` varchar(1) NULL;
 ALTER TABLE `player` ADD `played_cards_this_round` varchar(20) DEFAULT '';
 ALTER TABLE `player` ADD `top_contract_value` INT(10) UNSIGNED DEFAULT 5;
 ALTER TABLE `player` ADD `forced_card_id` INT(10) UNSIGNED DEFAULT 0;
+ALTER TABLE `player` ADD `give_three_coins_card_id` INT(10) UNSIGNED DEFAULT 0;
 ALTER TABLE `player` ADD `reveal_money` TINYINT(1) NOT NULL DEFAULT '0';
 ALTER TABLE `player` ADD `forced_reveal` tinyint(1) NOT NULL DEFAULT '0';

@@ -98,7 +98,7 @@ $this->merchant_card = [
         'is_ship'        => 0,
         'reputation'     => 5,
         'rival_card_ids' => [],
-        'skill_type'     => 'return_gained_coins',
+        'skill_type'     => 'name_card_and_take_three_coins',
         'sprite_pos'     => 6,
     ],
     6  => [

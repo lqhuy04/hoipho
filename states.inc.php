@@ -167,7 +167,8 @@ $machinestates = [
             "choseRPSOpponent",
             "selectRPS",
             "copySkill",
-            "nameCard",
+            "nameCardToForcePlay",
+            "nameCardToTakeMoney",
         ],
         "transitions"           => [
             "activateSkills"                  => STATE_ACTIVATE_SKILLS,

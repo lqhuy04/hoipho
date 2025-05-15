@@ -367,9 +367,17 @@ class hoipholqhuy extends Table
         return $cards;
     }
 
-    function getAllCards()
+    function getAllCardsToForce()
     {
         $sql = "SELECT card_id, card_type FROM card WHERE (card_type <> 4 AND card_type <> 16) ORDER BY card_type ASC";
+        $cards = self::getCollectionFromDB($sql);
+
+        return $cards;
+    }
+
+    function getAllCardsToTakeThreeMoney()
+    {
+        $sql = "SELECT card_id, card_type FROM card WHERE (card_type <> 5 AND card_type <> 16) ORDER BY card_type ASC";
         $cards = self::getCollectionFromDB($sql);
 
         return $cards;
@@ -1633,15 +1641,19 @@ class hoipholqhuy extends Table
         }
     }
 
-    function nameCard($card_id)
+    function nameCardToForcePlay($card_type)
     {
-        $this->gamestate->checkPossibleAction('nameCard');
+        $this->gamestate->checkPossibleAction('nameCardToForcePlay');
 
         $this->doPause(1);
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
         $current_player_name = $this->getCurrentPlayerName();
+
+        //get card id from card type
+        $sql = "SELECT card_id FROM card WHERE card_type = $card_type";
+        $card_id = self::getUniqueValueFromDB($sql);
         
         // Set the named card in game state
         self::setGameStateValue('named_card_id', $card_id);
@@ -1660,6 +1672,107 @@ class hoipholqhuy extends Table
         );
 
         $this->gamestate->nextState('endOfTurnCleanup');
+    }
+
+    function nameCardToTakeMoney($card_type)
+    {
+            $this->gamestate->checkPossibleAction('nameCardToTakeMoney');
+
+            $this->doPause(1);
+
+            $players = self::loadPlayersBasicInfos();
+            $current_player_id = self::getCurrentPlayerId();
+            $current_player_name = $this->getCurrentPlayerName();
+
+            //get card id from card type
+            $sql = "SELECT card_id FROM card WHERE card_type = $card_type";
+            $card_id = self::getUniqueValueFromDB($sql);
+            
+            // Set the named card in game state
+            self::setGameStateValue('named_card_id', $card_id);
+
+            //update forced_card_id in player table of all player
+            $sql = "UPDATE player SET give_three_coins_card_id = $card_id";
+            self::DbQuery($sql);
+
+            self::notifyAllPlayers(
+                'msg',
+                clienttranslate('${player_name} names the ${card_name} card'),
+                [
+                    'player_name' => $players[$current_player_id]['player_name'],
+                    'card_name'   => $this->merchant_card[$this->getCardType($card_id)]['name'],
+                ]
+            );
+
+            $this->takeThreeMoneyFromNamedCardHolder($current_player_id);
+
+            $this->gamestate->nextState('endOfTurnCleanup');
+        }
+
+        function takeThreeMoneyFromNamedCardHolder($current_player_id) {
+        $named_card_id = self::getGameStateValue('named_card_id');
+        if ($named_card_id == 0) return; // No named card
+        
+        $players = self::loadPlayersBasicInfos();
+        $current_player_name = $this->getPlayerName($current_player_id);
+        
+        // Check if any player has the named card in hand
+        $sql = "SELECT card_location_arg as player_id FROM card 
+                WHERE card_id = $named_card_id 
+                AND card_location = 'hand'";
+        $result = self::getCollectionFromDb($sql);
+        
+        if (count($result)) {
+            $target_player_id = key($result);
+            $target_player_name = $players[$target_player_id]['player_name'];
+            $card_name = $this->merchant_card[$this->getCardType($named_card_id)]['name'];
+            
+            // Check if target player has at least 3 coins
+            $target_coins = $this->getPlayersAssets($target_player_id)['coins_total'];
+            $amount_to_take = min(3, $target_coins);
+            
+            if ($amount_to_take > 0) {
+                // Take money from target player and give to current player
+                $this->manageCoins($target_player_id, 'sub', $amount_to_take, true);
+                $this->manageCoins($current_player_id, 'add', $amount_to_take, false);
+                
+                self::notifyAllPlayers(
+                    'msg', 
+                    clienttranslate('${player_name} takes ${amount} coins from ${target_player_name} who had the named card (${card_name})'),
+                    [
+                        'player_name' => $current_player_name,
+                        'target_player_name' => $target_player_name,
+                        'amount' => $amount_to_take,
+                        'card_name' => $card_name
+                    ]
+                );
+                
+                $this->runSwitchCoinAnimation($target_player_id, $current_player_id, $amount_to_take);
+                $this->refreshPlayerAssets();
+            } else {
+                self::notifyAllPlayers(
+                    'msg', 
+                    clienttranslate('${target_player_name} has the named card (${card_name}) but no coins to give'),
+                    [
+                        'target_player_name' => $target_player_name,
+                        'card_name' => $card_name
+                    ]
+                );
+            }
+        } else {
+            self::notifyAllPlayers(
+                'msg', 
+                clienttranslate('No player has the named card (${card_name}) in hand'),
+                [
+                    'card_name' => $this->merchant_card[$this->getCardType($named_card_id)]['name']
+                ]
+            );
+        }
+        
+        // Reset the named card
+        self::setGameStateValue('named_card_id', 0);
+        $sql = "UPDATE player SET give_three_coins_card_id = 0";
+        self::DbQuery($sql);
     }
 
 
@@ -1741,7 +1854,10 @@ class hoipholqhuy extends Table
                 $skills_to_copy = $this->getSkillsToCopy();
                 break;
             case 'gain_one_coin_and_name_card':
-                $all_cards = $this->getAllCards();
+                $all_cards = $this->getAllCardsToForce();
+                break;
+            case 'name_card_and_take_three_coins':
+                $all_cards = $this->getAllCardsToTakeThreeMoney();
                 break;
             case 'pick_rps':
                 $selected_player_id = self::getGameStateValue('rps_opponent');
@@ -2377,6 +2493,9 @@ class hoipholqhuy extends Table
                     $this->doPause(500);
                     $this->refreshPlayerAssets();
                     $this->doPause(2000);
+                    $this->gamestate->setPlayersMultiactive([$skill_player_id], 'multiActiveSkill');
+                    break;
+                case 'name_card_and_take_three_coins':
                     $this->gamestate->setPlayersMultiactive([$skill_player_id], 'multiActiveSkill');
                     break;
                 case 'all_players_pass_one_card':
