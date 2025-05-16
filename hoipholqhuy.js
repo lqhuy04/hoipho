@@ -154,6 +154,7 @@ define([
                 //     this.playerTableStock[player_id].setSelectionMode(0);
                 // }
 
+
                 for (let i in this.card_types) {
                     let card_type = this.card_types[i];
                     let weight    = card_type['type_id'];
@@ -236,7 +237,7 @@ define([
 
                 switch (stateName) {
 
-                    case 'selectCard':
+                    case 'actSelectCard':
                     case 'discardOneCard':
                         // if (this.isCurrentPlayerActive()) {
                         //     this.makeHandCardsSelectable();
@@ -294,7 +295,7 @@ define([
                 if (this.isCurrentPlayerActive()) {
                     console.log(this.skill_to_play);
                     switch (stateName) {
-                        case 'selectCard':
+                        case 'actSelectCard':
                         case 'discardOneCard':
                             this.makeHandCardsSelectable();
                             break;
@@ -325,7 +326,7 @@ define([
                     }
                 } else {
                     switch (stateName) {
-                        case 'selectCard':
+                        case 'actSelectCard':
                         case 'discardOneCard':
                             break;
                         default:
@@ -440,7 +441,7 @@ define([
                         case 'discardOneCard':
                             this.addRedPrimaryActionButton('button_select', _('Confirm selection (DISCARD!)'), 'onSelectCard');
                             break;
-                        case 'selectCard':
+                        case 'actSelectCard':
                             this.addPrimaryActionButton('button_select', _('Confirm selection'), 'onSelectCard');
                             break;
                     }
@@ -1208,17 +1209,31 @@ define([
                 }
 
                 let selected_card_id = items[0].id;
+
+                // Check if player has a forced card
+                if (this.gamedatas.forced_card_id > 0) {
+                    // Check if selected card matches forced card
+                    if (selected_card_id != this.gamedatas.forced_card_id) {
+                        // Show error message but don't proceed with selection
+                        this.showMessage(_('You must play the named card!'), 'error');
+                        this.myHand.unselectAll();
+                        return;
+                    }
+                }
                 // this.makeHandCardsNotSelectable();
                 this.removeActionButton('button_select');
                 dojo.query('.card-selected').removeClass('card-selected');
                 dojo.addClass('my_hand_stock_item_' + selected_card_id, 'card-selected');
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:    true,
-                    card_id: selected_card_id
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:    true,
+                //     card_id: selected_card_id
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actSelectCard', {
+                    cardId: selected_card_id
                 });
             },
 
@@ -1227,10 +1242,10 @@ define([
 
                 dojo.stopEvent(evt);
 
-                let action = 'returnOneCard';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'returnOneCard';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
                 let items = this.myHand.getSelectedItems();
                 if (items.length !== 1) {
@@ -1239,11 +1254,14 @@ define([
 
                 let selected_card_id = items[0].id;
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:    true,
-                    card_id: selected_card_id
-                }, this, function (result) {
-                }, function (is_error) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:    true,
+                //     card_id: selected_card_id
+                // }, this, function (result) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actReturnOneCard', {
+                    cardId: selected_card_id
                 });
             },
 
@@ -1251,10 +1269,10 @@ define([
                 console.log('onClickRpsButton');
                 dojo.stopEvent(evt);
 
-                let action = 'selectRPS';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'selectRPS';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
                 let split = evt.target.id.split('_');
                 let rps   = split[1];
@@ -1263,12 +1281,15 @@ define([
                 this.removeActionButton('btn_paper');
                 this.removeActionButton('btn_scissors');
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock: true,
-                    rps:  rps
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock: true,
+                //     rps:  rps
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actSelectRPS', {
+                    rps: rps
                 });
             },
 
@@ -1293,62 +1314,74 @@ define([
                 this.makeHandCardsNotSelectable();
                 this.markSelectedCard(selected_card_id);
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:    true,
-                    card_id: selected_card_id
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:    true,
+                //     card_id: selected_card_id
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actSelectCardToGiveLeft', {
+                    cardId: selected_card_id
                 });
             },
             
             onClickButtonStealHalfMoney: function (evt) {
                 console.log('onClickButtonStealHalfMoney');
 
-                let action = 'stealHalfMoney';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'stealHalfMoney';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
                 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:          true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:          true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actStealHalfMoney', {
+                    targetPlayer: this.skill_target_player
                 });
             },
             onClickButtonStealThreeCoins: function (evt) {
                 console.log('onClickButtonStealThreeCoins');
 
-                let action = 'stealThreeCoins';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'stealThreeCoins';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:          true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:          true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actStealThreeCoins', {
+                    targetPlayer: this.skill_target_player
                 });
             },
 
             onClickButtonChoseRPSOpponent: function (evt) {
                 console.log('onClickButtonStealThreeCoins');
 
-                let action = 'choseRPSOpponent';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'choseRPSOpponent';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:          true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:          true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actChoseRPSOpponent', {
+                    targetPlayer: this.skill_target_player
                 });
             },
 
@@ -1356,53 +1389,62 @@ define([
                 console.log('onClickButtonStealACard');
 
 
-                let action = 'stealOneCard';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'stealOneCard';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
                 this.return_card_to_player = this.skill_target_player;
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:          true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:          true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actStealOneCard', {
+                    targetPlayer: this.skill_target_player
                 });
             },
 
             onClickButtonGiveOneCoin: function (evt) {
                 console.log('onClickButtonGiveOneCoin');
 
-                let action = 'giveOneCoin';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'giveOneCoin';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:          true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:          true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actGiveOneCoin', {
+                    targetPlayer: this.skill_target_player
                 });
             },
 
             onClickButtonSwitchMoney: function (evt) {
                 console.log('onClickButtonSwitchMoney');
 
-                let action = 'switchMoney';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'switchMoney';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:           true,
-                    target_player: this.skill_target_player
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:           true,
+                //     target_player: this.skill_target_player
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actSwitchMoney', {
+                    targetPlayer: this.skill_target_player
                 });
             },
 
@@ -1411,27 +1453,32 @@ define([
                 
                 let action;
                 if (this.skill_to_play == 'name_card_and_take_three_coins') {
-                    action = 'nameCardToTakeMoney';
+                    this.bgaPerformAction('actNameCardToTakeMoney', {
+                        cardType: this.named_card_id
+                    });
                 } else {
-                    action = 'nameCardToForcePlay';
+                    this.bgaPerformAction('actNameCardToForcePlay', {
+                        cardType: this.named_card_id
+                    });
                 }
 
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
                 if (this.named_card_id == 0) {
                     return;
                 }
 
-                dojo.addClass('name_card_wrapper', 'element-hidden');
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:     true,
-                    card_type: this.named_card_id,
-                }, this, function (result) {
+                // dojo.addClass('name_card_wrapper', 'element-hidden');
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:     true,
+                //     card_type: this.named_card_id,
+                // }, this, function (result) {
 
-                }, function (is_error) {
-                });
+                // }, function (is_error) {
+                // });
+
             },
 
             // onClickButtonNameOneCardToTakeMoney: function (evt) {
@@ -1459,58 +1506,28 @@ define([
             onClickButtonCopySkill: function (evt) {
                 console.log('onClickButtonCopySkill');
 
-                let action = 'copySkill';
-                if (!this.checkAction(action)) {
-                    return;
-                }
+                // let action = 'copySkill';
+                // if (!this.checkAction(action)) {
+                //     return;
+                // }
 
                 if (this.copy_skill_id == 0) {
                     return;
                 }
 
                 dojo.addClass('copy_card_wrapper', 'element-hidden');
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                    lock:     true,
-                    skill_id: this.copy_skill_id,
-                }, this, function (result) {
+                // this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                //     lock:     true,
+                //     skill_id: this.copy_skill_id,
+                // }, this, function (result) {
 
-                }, function (is_error) {
+                // }, function (is_error) {
+                // });
+                this.bgaPerformAction('actCopySkill', {
+                    skillId: this.copy_skill_id
                 });
             },
 
-            /* Example:
-
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-
-                this.ajaxcall( "/faifo/faifo/myAction.html", {
-                                                                        lock: true,
-                                                                        myArgument1: arg1,
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     },
-                             this, function( result ) {
-
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-
-                             }, function( is_error) {
-
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-
-                             } );
-            },
-
-            */
 
 
             ///////////////////////////////////////////////////

@@ -882,7 +882,7 @@ class hoipholqhuy extends Table
 
     function selectCard($card_id)
     {
-        $this->gamestate->checkPossibleAction('selectCard');
+        //$this->gamestate->checkPossibleAction('selectCard');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -921,7 +921,7 @@ class hoipholqhuy extends Table
                         'card_name' => $this->merchant_card[$this->getCardType($forced_card_id)]['name']
                     ]);
                     
-                    $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
+                    //$this->gamestate->setPlayerNonMultiactive($current_player_id, '');
                     return;
                 }
             }
@@ -1028,7 +1028,7 @@ class hoipholqhuy extends Table
 
     function selectCardToGiveLeft($card_id)
     {
-        $this->gamestate->checkPossibleAction('selectCardToGiveLeft');
+        //$this->gamestate->checkPossibleAction('selectCardToGiveLeft');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1110,7 +1110,7 @@ class hoipholqhuy extends Table
 
     function stealHalfMoney($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('stealHalfMoney');
+        //$this->gamestate->checkPossibleAction('stealHalfMoney');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1145,7 +1145,7 @@ class hoipholqhuy extends Table
 
     function stealThreeCoins($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('stealThreeCoins');
+        //$this->gamestate->checkPossibleAction('stealThreeCoins');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1180,7 +1180,7 @@ class hoipholqhuy extends Table
 
     function stealOneCard($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('stealOneCard');
+        //$this->gamestate->checkPossibleAction('stealOneCard');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1236,7 +1236,7 @@ class hoipholqhuy extends Table
 
     function returnOneCard($card_id)
     {
-        $this->gamestate->checkPossibleAction('returnOneCard');
+        //$this->gamestate->checkPossibleAction('returnOneCard');
 
         if ($card_id == self::getGameStateValue('stolen_card_id')) {
             throw new BgaUserException(self::_("You must return a different card!"));
@@ -1295,7 +1295,7 @@ class hoipholqhuy extends Table
 
     function giveOneCoin($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('giveOneCoin');
+        //$this->gamestate->checkPossibleAction('giveOneCoin');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1325,56 +1325,10 @@ class hoipholqhuy extends Table
         self::setGameStateValue('skill_done', 1);
         $this->gamestate->setAllPlayersNonMultiactive("multiActiveSkill");
     }
-    // function nameOneCard()
-    // {
-    //     $this->gamestate->checkPossibleAction('nameOneCard');
-
-    //     $players = self::loadPlayersBasicInfos();
-    //     $current_player_id = self::getCurrentPlayerId();
-    //     $current_player_name = self::getCurrentPlayerName();
-
-    //     // Find which player has this card type in hand
-    //     $player_with_card = null;
-    //     foreach ($players as $player_id => $player) {
-    //         $hand = $this->cards->getCardsInLocation('hand', $player_id);
-    //         foreach ($hand as $card) {
-    //             if ($card['type'] == $card_type) {
-    //                 $player_with_card = $player_id;
-    //                 break 2;
-    //             }
-    //         }
-    //     }
-
-    //     if ($player_with_card) {
-    //         // Store that this player must play this card next turn
-    //         self::setGameStateValue('forced_card_player', $player_with_card);
-    //         self::setGameStateValue('forced_card_type', $card_type);
-
-    //         self::notifyAllPlayers(
-    //             'msg',
-    //             clienttranslate('${player_name} must play the ${card_name} card next turn'),
-    //             [
-    //                 'player_name' => $players[$player_with_card]['player_name'],
-    //                 'card_name' => $this->merchant_card[$card_type]['name']
-    //             ]
-    //         );
-    //     } else {
-    //         self::notifyAllPlayers(
-    //             'msg',
-    //             clienttranslate('No player has the selected merchant card in hand'),
-    //             []
-    //         );
-    //     }
-
-    //     self::setGameStateValue('special_skill_type', 11);
-    //     self::setGameStateValue('named_card_id', $card_id);
-    //     $this->gamestate->setAllPlayersNonMultiactive("multiActiveSkill");
-    //     $this->gamestate->setPlayerNonMultiactive($current_player_id, "multiActiveSkillCheckTransition");
-    // }
 
     function choseRPSOpponent($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('choseRPSOpponent');
+        //$this->gamestate->checkPossibleAction('choseRPSOpponent');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1395,7 +1349,7 @@ class hoipholqhuy extends Table
 
     function selectRPS($rps)
     {
-        $this->gamestate->checkPossibleAction('selectRPS');
+        //$this->gamestate->checkPossibleAction('selectRPS');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1561,7 +1515,7 @@ class hoipholqhuy extends Table
 
     function switchMoney($target_player_id)
     {
-        $this->gamestate->checkPossibleAction('switchMoney');
+        //$this->gamestate->checkPossibleAction('switchMoney');
 
         $players = self::loadPlayersBasicInfos();
         $current_player_id = self::getCurrentPlayerId();
@@ -1620,7 +1574,7 @@ class hoipholqhuy extends Table
 
     function copySkill($skill_type_id)
     {
-        $this->gamestate->checkPossibleAction('copySkill');
+        //$this->gamestate->checkPossibleAction('copySkill');
 
         $this->doPause(1);
 
@@ -1644,7 +1598,7 @@ class hoipholqhuy extends Table
 
     function nameCardToForcePlay($card_type)
     {
-        $this->gamestate->checkPossibleAction('nameCardToForcePlay');
+        //$this->gamestate->checkPossibleAction('nameCardToForcePlay');
 
         $this->doPause(1);
 
@@ -1677,7 +1631,7 @@ class hoipholqhuy extends Table
 
     function nameCardToTakeMoney($card_type)
     {
-            $this->gamestate->checkPossibleAction('nameCardToTakeMoney');
+            //$this->gamestate->checkPossibleAction('nameCardToTakeMoney');
 
             $this->doPause(1);
 
@@ -2052,7 +2006,7 @@ class hoipholqhuy extends Table
         if (self::getGameStateValue('discard_move') == 1) {
             $this->gamestate->nextState('discardOneCard');
         } else {
-            $this->gamestate->nextState('selectCard');
+            $this->gamestate->nextState('actSelectCard');
         }
     }
 
@@ -2084,7 +2038,7 @@ class hoipholqhuy extends Table
         $this->refreshPlayedCards();
 
         $this->resetCardSelections();
-        $this->gamestate->nextState('selectCard');
+        $this->gamestate->nextState('actSelectCard');
 
         self::giveTimeToAllPlayers();
     }
@@ -2585,7 +2539,7 @@ class hoipholqhuy extends Table
         if ($current_move == 3) {
             $this->gamestate->nextState('resolveRound');
         } else {
-            $this->gamestate->nextState('selectCard');
+            $this->gamestate->nextState('actSelectCard');
         }
     }
 
@@ -3213,5 +3167,57 @@ class hoipholqhuy extends Table
         }
 
         $this->lightUpPlayersCards($player_ids);
+    }
+
+    public function actSelectCard(int $cardId) {
+        $this->selectCard($cardId);
+    }
+
+    public function actSelectCardToGiveLeft(int $cardId) {
+        $this->selectCardToGiveLeft($cardId);
+    }
+
+    public function actStealThreeCoins(int $targetPlayer) {
+        $this->stealThreeCoins($targetPlayer);
+    }
+
+    public function actStealHalfMoney(int $targetPlayer) {
+        $this->stealHalfMoney($targetPlayer);
+    }
+
+    public function actStealOneCard(int $targetPlayer) {
+        $this->stealOneCard($targetPlayer);
+    }
+
+    public function actReturnOneCard(int $cardId) {
+        $this->returnOneCard($cardId);
+    }
+
+    public function actGiveOneCoin(int $targetPlayer) {
+        $this->giveOneCoin($targetPlayer);
+    }
+
+    public function actSwitchMoney(int $targetPlayer) {
+        $this->switchMoney($targetPlayer);
+    }
+
+    public function actChoseRPSOpponent(int $targetPlayer) {
+        $this->choseRPSOpponent($targetPlayer);
+    }
+
+    public function actSelectRPS(string $rps) {
+        $this->selectRPS($rps);
+    }
+
+    public function actCopySkill(int $skillId) {
+        $this->copySkill($skillId);
+    }
+
+    public function actNameCardToForcePlay(int $cardType) {
+        $this->nameCardToForcePlay($cardType);
+    }
+
+    public function actNameCardToTakeMoney(int $cardType) {
+        $this->nameCardToTakeMoney($cardType);
     }
 }

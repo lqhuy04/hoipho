@@ -9,6 +9,7 @@
     <div class="game-table table-shadow">
         <div class="center-flex">
             <div id="player_tables" class="bg-light player-tables-shadow">
+                <canvas id="spriteCanvas" style="display: none;"></canvas>
                 <!-- BEGIN player_table -->
                 <div id="table_player_{PLAYER_ID}" class="player-table outer-block table-shadow">
                     <div id="player_{PLAYER_ID}_table_click_space" class="player-table-click-space"></div>
