@@ -3,6 +3,7 @@
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
  * FaiFo implementation : © Daniel Süß <xcid@steinlaus.com>
+ * Second Edition was implemented by Le Quoc Huy <lqhuy.work@gmail.com> reusing some code from the first edition
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.

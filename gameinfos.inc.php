@@ -13,16 +13,16 @@
 $gameinfos = [
 
     // Name of the game in English (will serve as the basis for translation)
-    'game_name'                            => "hoipholqhuy",
+    'game_name'                            => "Hội Phố (Second Edition)",
 
     // Game designer (or game designers, separated by commas)
-    'designer'                             => 'Toàn Nguyễn',
+    'designer'                             => 'Toàn Nguyễn, Mẫn Trần',
 
     // Game artist (or game artists, separated by commas)
-    'artist'                               => 'Toàn Nguyễn',
+    'artist'                               => 'Toàn Nguyễn, Mẫn Trần',
 
     // Year of FIRST publication of this game. Can be negative.
-    'year'                                 => 2019,
+    'year'                                 => 2021,
 
     // Game publisher (use empty string if there is no publisher)
     'publisher'                            => 'Ngũ Hành Games',
