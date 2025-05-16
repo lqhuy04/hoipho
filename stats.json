@@ -1,0 +1,61 @@
+{
+    "table": {
+        "money_gained": {
+            "id": 10,
+            "name": "Money gained",
+            "type": "int"
+        },
+        "money_lost": {
+            "id": 11,
+            "name": "Money lost",
+            "type": "int"
+        },
+        "cheapest_contract": {
+            "id": 12,
+            "name": "Cheapest contract price",
+            "type": "int"
+        },
+        "most_expensive_contract": {
+            "id": 13,
+            "name": "Most expensive contract price",
+            "type": "int"
+        }
+    },
+    "player": {
+        "money_gained": {
+            "id": 10,
+            "name": "Money gained",
+            "type": "int"
+        },
+        "money_lost": {
+            "id": 11,
+            "name": "Money lost",
+            "type": "int"
+        },
+        "money_gained_from_players": {
+            "id": 12,
+            "name": "Money gained from other players",
+            "type": "int"
+        },
+        "money_lost_to_players": {
+            "id": 13,
+            "name": "Money lost to other players",
+            "type": "int"
+        },
+        "money_gained_from_ships": {
+            "id": 14,
+            "name": "Money gained from ships",
+            "type": "int"
+        },
+        "only_ship": {
+            "id": 15,
+            "name": "Played the only ship",
+            "type": "int"
+        },
+        "money_spend_on_contracts": {
+            "id": 16,
+            "name": "Money spend on contracts",
+            "type": "int"
+        }
+    }
+}
