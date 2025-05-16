@@ -894,15 +894,6 @@ class hoipholqhuy extends Table
         $sql = "SELECT forced_card_id FROM player WHERE player_id = $current_player_id";
         $forced_card_id = self::getUniqueValueFromDB($sql);
 
-        // Player already selected a card and changed their mind?
-        $sql = "SELECT selected_card_id FROM player WHERE player_id = $current_player_id AND selected_card_id > 0";
-        $result = self::getUniqueValueFromDB($sql);
-        if ($result) {
-            $old_card_id = $result;
-            $selection_changed = true;
-            self::DbQuery($sql);
-        }
-
         // Check if player has the named card and must play it
         if ($forced_card_id > 0) {
             // Check if the selected card is the forced card
@@ -927,12 +918,20 @@ class hoipholqhuy extends Table
             }
         }
 
+        // Player already selected a card and changed their mind?
+        $sql = "SELECT selected_card_id FROM player WHERE player_id = $current_player_id AND selected_card_id > 0";
+        $result = self::getUniqueValueFromDB($sql);
+        if ($result) {
+            $old_card_id = $result;
+            $selection_changed = true;
+            self::DbQuery($sql);
+        }
+
+
         // Normal card selection
         self::checkPlayerPossessesCard($current_player_id, $card_id);
         $sql = "UPDATE player SET selected_card_id = $card_id WHERE player_id = $current_player_id";
         self::DbQuery($sql);
-        // $sql = "UPDATE player SET selected_card_id = $card_id WHERE player_id = $current_player_id";
-        // self::DbQuery($sql);
 
         if (self::getGameStateValue('discard_move') == 1) {
             $string_select = clienttranslate('${player_name} selects a card to discard');
@@ -2106,6 +2105,11 @@ class hoipholqhuy extends Table
         }
 
         // LET'S DEAL WITH THE SHIPS FIRST
+        self::notifyAllPlayers(
+            'updateGameState',
+            '',
+            ['state' => 'resolveShip'] // Change this for each state
+        );
         $amt_coins_to_add = 0;
         $message = '';
         switch ($count_ships) {
@@ -2168,6 +2172,12 @@ class hoipholqhuy extends Table
 
         // NOW REWARD THE HIGHEST CARD(S)
 
+        self::notifyAllPlayers(
+            'updateGameState',
+            '',
+            ['state' => 'resolveRival'] // Change this for each state
+        );
+
         $reputation_to_zero_applied = [];
         // Deal with the special conditions
         foreach ($merchants as $card_id => $merchant) {
@@ -2202,6 +2212,11 @@ class hoipholqhuy extends Table
 
 
         // NOW, DEAL WITH THE RESULTS
+        self::notifyAllPlayers(
+            'updateGameState',
+            '',
+            ['state' => 'compareReputation'] // Change this for each state
+        );
         $count_merchants = count($merchants);
 
 
@@ -2290,19 +2305,23 @@ class hoipholqhuy extends Table
             $this->doPause(500);
 
             // Coins for the winners!!
+            $highest_card_type = $move_results['highest']['type_id'];
+            $highest_coin_value = $this->merchant_card[$highest_card_type]['highest_coin'];
+
             $this->manageCoins(
                 $move_results['highest']['player_id'],
                 'add',
-                $this->scoring_rules['coins']['highest']
+                $highest_coin_value
             );
-            $this->runAddCoinAnimation($move_results['highest']['player_id'], $this->scoring_rules['coins']['highest']);
+
+            $this->runAddCoinAnimation($move_results['highest']['player_id'], $highest_coin_value);
             self::notifyAllPlayers(
                 'msg',
                 $this->langitem['highest_card_played'],
                 [
                     'player_name' => $this->getPlayerName($move_results['highest']['player_id']),
                     'reputation'  => $move_results['highest']['reputation'],
-                    'coin_amount' => $this->scoring_rules['coins']['highest'],
+                    'coin_amount' => $highest_coin_value,
                 ]
             );
             $this->removeLitUpPlayerCards($move_results['highest']['player_id']);
@@ -2310,14 +2329,16 @@ class hoipholqhuy extends Table
 
             if ($move_results['second_highest']) {
                 $this->doPause(1000);
+                $second_card_type = $move_results['second_highest']['type_id'];
+                $second_coin_value = $this->merchant_card[$second_card_type]['second_coin'];
                 $this->manageCoins(
                     $move_results['second_highest']['player_id'],
                     'add',
-                    $this->scoring_rules['coins']['second_highest']
+                    $second_coin_value
                 );
                 $this->runAddCoinAnimation(
                     $move_results['second_highest']['player_id'],
-                    $this->scoring_rules['coins']['second_highest']
+                    $second_coin_value
                 );
                 self::notifyAllPlayers(
                     'msg',
@@ -2325,7 +2346,7 @@ class hoipholqhuy extends Table
                     [
                         'player_name' => $this->getPlayerName($move_results['second_highest']['player_id']),
                         'reputation'  => $move_results['second_highest']['reputation'],
-                        'coin_amount' => $this->scoring_rules['coins']['second_highest'],
+                        'coin_amount' => $second_coin_value,
                     ]
                 );
                 $this->removeLitUpPlayerCards($move_results['second_highest']['player_id']);
@@ -2341,8 +2362,18 @@ class hoipholqhuy extends Table
             $this->doPause(2000);
 
             // AT LAST, ACTIVATE CARD SKILLS
+            self::notifyAllPlayers(
+                'updateGameState',
+                '',
+                ['state' => 'resolveSkill'] // Change this for each state
+            );
             $this->activateNextSkillInQueue();
         } else {
+            self::notifyAllPlayers(
+                'updateGameState',
+                '',
+                ['state' => 'endTurn'] // Change this for each state
+            );
             $this->gamestate->nextState('endOfTurnCleanup');
         }
     }
@@ -2520,6 +2551,11 @@ class hoipholqhuy extends Table
 
     function stEndOfTurnCleanup()
     {
+        self::notifyAllPlayers(
+            'updateGameState',
+            '',
+            ['state' => 'endTurn'] // Change this for each state
+        );
         $current_move = self::getGameStateValue('current_move');
 
         $this->removeLitUpPlayerCards();
@@ -2536,9 +2572,13 @@ class hoipholqhuy extends Table
 
         self::setGameStateValue('copied_skill_type_id', 0);
 
-        if ($current_move == 3) {
+        //reset state of the notification
+        self::notifyAllPlayers('updateGameState', '', ['state' => '']);
+
+        if ($current_move == 4) {
             $this->gamestate->nextState('resolveRound');
         } else {
+
             $this->gamestate->nextState('actSelectCard');
         }
     }

@@ -7,9 +7,30 @@
 
 <div id="game_main_wrapper">
     <div class="game-table table-shadow">
+        <div id="state_bar" class="state-bar">
+                    <div class="state-item" id="state_resolve_ship">
+                        <img src="{GAMETHEMEURL}img/number_0.png" alt="Resolve Ship">
+                        <div class="state-label">Resolve Ship</div>
+                    </div>
+                    <div class="state-item" id="state_resolve_rival">
+                        <img src="{GAMETHEMEURL}img/number_0.png" alt="Resolve Rival">
+                        <div class="state-label">Resolve Rival</div>
+                    </div>
+                    <div class="state-item" id="state_compare_reputation">
+                        <img src="{GAMETHEMEURL}img/number_0.png" alt="Compare Reputation">
+                        <div class="state-label">Compare Reputation</div>
+                    </div>
+                    <div class="state-item" id="state_resolve_skill">
+                        <img src="{GAMETHEMEURL}img/number_0.png" alt="Resolve Skill">
+                        <div class="state-label">Resolve Skill</div>
+                    </div>
+                    <div class="state-item" id="state_end_turn">
+                        <img src="{GAMETHEMEURL}img/number_0.png" alt="End Turn">
+                        <div class="state-label">End Turn</div>
+                    </div>
+        </div>
         <div class="center-flex">
             <div id="player_tables" class="bg-light player-tables-shadow">
-                <canvas id="spriteCanvas" style="display: none;"></canvas>
                 <!-- BEGIN player_table -->
                 <div id="table_player_{PLAYER_ID}" class="player-table outer-block table-shadow">
                     <div id="player_{PLAYER_ID}_table_click_space" class="player-table-click-space"></div>

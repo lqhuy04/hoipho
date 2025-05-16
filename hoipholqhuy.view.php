@@ -62,6 +62,9 @@
         $this->tpl['SKILL14'] = self::_("Reveal your money , then pay 3 money to the bank.");
         $this->tpl['SKILL15'] = self::_("Reveal your money , then pay 2 money to the opponents on your left and right.");
 
+        // Add this in the build_page function after the player tables
+        // $this->page->begin_block("hoipholqhuy_hoipholqhuy", "state_bar");
+        // $this->page->insert_block("state_bar");
 
         // Create the player tables
         $this->page->begin_block("hoipholqhuy_hoipholqhuy", "player_table");
@@ -72,6 +75,7 @@
                 "PLAYER_COLOR" => $players[$player_id]['player_color'],
             ]);
         }
+
 
         /*********** Do not change anything below this line  ************/
   	}

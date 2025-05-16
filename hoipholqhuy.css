@@ -871,3 +871,34 @@
     padding: 2px;
     background-color: darkkhaki;
 }
+
+.state-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.state-item {
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.state-item img {
+    width: 40px;
+    height: 40px;
+}
+
+.state-item.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.state-label {
+    font-size: 12px;
+    margin-top: 5px;
+}

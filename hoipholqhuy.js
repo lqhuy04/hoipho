@@ -1584,6 +1584,7 @@ define([
                 dojo.subscribe('revealMoney', this, "notif_revealMoney");
                 dojo.subscribe('revealAllMoney', this, "notif_revealAllMoney");
                 dojo.subscribe('revealAllMoneyForComparison', this, "notif_revealAllMoneyForComparison");
+                dojo.subscribe('updateGameState', this, "notif_updateGameState");
 
 
                 this.notifqueue.setSynchronous('addCoins', 200);
@@ -1996,6 +1997,31 @@ define([
                 // animation_id.play();
 
                 // this.refreshPlayersAssets();
+            },
+
+            notif_updateGameState: function(notif) {
+                // Reset all states
+                dojo.query('.state-item').removeClass('active');
+                
+                // Highlight current state
+                let currentState = notif.args.state;
+                    switch(currentState) {
+                        case 'resolveShip':
+                            dojo.addClass('state_resolve_ship', 'active');
+                            break;
+                        case 'resolveRival':
+                            dojo.addClass('state_resolve_rival', 'active');
+                            break;
+                        case 'compareReputation':
+                            dojo.addClass('state_compare_reputation', 'active');
+                            break;
+                        case 'resolveSkill':
+                            dojo.addClass('state_resolve_skill', 'active');
+                            break;
+                        case 'endTurn':
+                            dojo.addClass('state_end_turn', 'active');
+                            break;
+                    }
             },
 
             notif_clearTables: function (notif) {
