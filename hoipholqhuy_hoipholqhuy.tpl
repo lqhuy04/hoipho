@@ -55,14 +55,7 @@
             </div>
         </div>
 
-        <div class="center-flex">
-            <div id="my_hand_wrapper" class="outer-block">
-                <div style="text-align: center; margin-bottom: 5px; color:black">{MY_HAND}</div>
-                <div id="my_hand_stock"></div>
-            </div>
-        </div>
-
-        <div class="center-flex">
+                <div class="center-flex">
             <div id="name_card_wrapper" class="outer-block element-hidden">
                 <div style="text-align: center; color:black">{NAME A CARD}</div>
                 <div id="cards_to_name"></div>
@@ -75,6 +68,14 @@
                 <div id="cards_to_copy"></div>
             </div>
         </div>
+
+        <div class="center-flex">
+            <div id="my_hand_wrapper" class="outer-block">
+                <div style="text-align: center; margin-bottom: 5px; color:black">{MY_HAND}</div>
+                <div id="my_hand_stock"></div>
+            </div>
+        </div>
+
 
         <div class="center-flex">
             <div id="discard_wrapper" class="outer-block">

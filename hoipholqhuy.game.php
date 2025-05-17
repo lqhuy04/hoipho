@@ -1970,8 +1970,6 @@ class hoipholqhuy extends Table
         $this->refreshPlayerAssets();
         $this->doPause(1500); // Pause to let players see the notifications
 
-        $this->refreshPlayerAssets();
-
 
         // Deal 1 merchant ship to each player
         foreach ($players as $player_id => $player) {
